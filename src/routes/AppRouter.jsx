@@ -5,6 +5,7 @@ import { Dashboard } from "../pages/Dashboard";
 import { VendedoresPage } from "../pages/VendedoresPage";
 import { ClientesPage } from "../pages/ClientesPage";
 import { SerialesPage } from "../pages/SerialesPage";
+import { ActivacionesPage } from "../pages/Activaciones";
 import { VentasListPage } from "../pages/VentasListPage";
 import { VentaFormPage } from "../pages/VentaFormPage";
 import { MainLayout } from "../components/MainLayout";
@@ -61,6 +62,7 @@ export const AppRouter = () => {
           <Route path="/vendedores" element={<VendedoresPage />} />
           <Route path="/clientes" element={<ClientesPage />} />
           <Route path="/seriales" element={<SerialesPage />} />
+          <Route path="/activaciones" element={<ActivacionesPage />} />
           <Route path="/ventas" element={<VentasListPage />} />
           <Route path="/ventas/nueva" element={<VentaFormPage />} />
           <Route path="/ventas/editar/:id" element={<VentaFormPage />} />

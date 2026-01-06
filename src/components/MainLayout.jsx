@@ -37,6 +37,14 @@ export const MainLayout = () => {
         setVisible(false);
       },
     },
+    {
+      label: "Vendedores",
+      icon: "pi pi-id-card",
+      command: () => {
+        navigate("/vendedores");
+        setVisible(false);
+      },
+    },
   ];
 
   // Contenido de la derecha en el Menubar

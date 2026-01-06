@@ -15,7 +15,10 @@ import api from "../api/axios";
 export const VentasListPage = () => {
   const [ventas, setVentas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [anoFiltro, setAnoFiltro] = useState(new Date().getFullYear());
+  const [anoFiltro, setAnoFiltro] = useState(() => {
+    const persistido = localStorage.getItem("ventas_filtro_ano");
+    return persistido ? parseInt(persistido) : new Date().getFullYear();
+  });
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -29,6 +32,11 @@ export const VentasListPage = () => {
     label: `${2022 + i}`,
     value: 2022 + i,
   }));
+
+  useEffect(() => {
+    localStorage.setItem("ventas_filtro_ano", anoFiltro);
+    fetchVentas();
+  }, [anoFiltro]);
 
   useEffect(() => {
     fetchVentas();

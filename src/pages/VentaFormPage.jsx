@@ -23,8 +23,12 @@ export const VentaFormPage = () => {
     cliente_id: null,
     vendedor_id: null,
     serial_erp_id: null,
-    ano_gravable: new Date().getFullYear(),
-    ano_venta: new Date().getFullYear(),
+    ano_gravable:
+      parseInt(localStorage.getItem("ventas_filtro_ano")) ||
+      new Date().getFullYear(),
+    ano_venta:
+      parseInt(localStorage.getItem("ventas_filtro_ano")) ||
+      new Date().getFullYear(),
     fecha_venta: new Date(),
     valor_total: 0,
     observaciones: "",

@@ -1,0 +1,83 @@
+/* Aseguramos que el fondo cubra TODO el viewport */
+.layout-container {
+    min-height: 100vh;
+    width: 100%; /* Asegura ancho total */
+    background: radial-gradient(circle at center, #1a2a44 0%, #0d1117 100%);
+    background-attachment: fixed; /* El fondo no se mueve al hacer scroll */
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contenido Principal */
+.layout-content {
+    padding: 2rem;
+    flex-grow: 1; /* Ocupa el espacio restante */
+    width: 100%;
+    /* Quitamos el max-width si quieres que use toda la pantalla, 
+       o mantenlo pero el fondo ya estará cubierto por .layout-container */
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Menubar estilo Glass */
+.layout-menubar {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 0 !important;
+    padding: 0.7rem 1.5rem !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Sidebar estilo Glass */
+.custom-sidebar {
+    background: rgba(13, 17, 23, 0.95) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    width: 280px !important;
+}
+
+.custom-menu-item {
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 8px;
+    margin: 0.2rem 1rem;
+}
+
+.custom-menu-item:hover {
+    background: rgba(79, 172, 254, 0.1);
+    color: #4facfe;
+}
+
+.custom-menu-item i {
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+/* Contenido Principal */
+.layout-content {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Ajustes para Móvil */
+@media (max-width: 768px) {
+    .layout-content {
+        padding: 1rem;
+    }
+    
+    .custom-sidebar {
+        width: 85% !important;
+    }
+}

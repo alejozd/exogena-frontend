@@ -273,9 +273,15 @@ export const SerialesPage = () => {
               label="Cancelar"
               icon="pi pi-times"
               text
+              severity="danger"
               onClick={() => setSerialDialog(false)}
             />
-            <Button label="Guardar" icon="pi pi-check" onClick={saveSerial} />
+            <Button
+              label="Guardar"
+              icon="pi pi-check"
+              severity="success"
+              onClick={saveSerial}
+            />
           </div>
         }
       >

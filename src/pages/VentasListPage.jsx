@@ -28,10 +28,10 @@ export const VentasListPage = () => {
   const toast = useRef(null);
 
   // Generar lista de años (ej: desde 2020 hasta el actual + 1)
-  const anosOptions = Array.from({ length: 10 }, (_, i) => ({
-    label: `${2022 + i}`,
-    value: 2022 + i,
-  }));
+  const anosOptions = Array.from({ length: 7 }, (_, i) => {
+    const year = 2022 + i;
+    return { label: `${year}`, value: year };
+  });
 
   useEffect(() => {
     localStorage.setItem("ventas_filtro_ano", anoFiltro);
@@ -86,7 +86,7 @@ export const VentasListPage = () => {
     return (
       <div className="flex flex-wrap gap-3 justify-content-between align-items-center">
         <div className="flex align-items-center gap-3">
-          <h2 className="m-0 text-white font-light">
+          <h2 className="m-0 font-light" style={{ color: "#22C55E" }}>
             Registro de <span className="font-bold text-green-400">Ventas</span>
           </h2>
           <Dropdown

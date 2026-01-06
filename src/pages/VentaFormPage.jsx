@@ -7,17 +7,13 @@ import { InputNumber } from "primereact/inputnumber";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from "primereact/toast";
 import { Card } from "primereact/card";
+import { PagosSeccion } from "./PagosSeccion";
 import api from "../api/axios";
 
 export const VentaFormPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useRef(null);
-
-  const [clientes, setClientes] = useState([]);
-  const [vendedores, setVendedores] = useState([]);
-  const [serialesFiltrados, setSerialesFiltrados] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const emptyVenta = {
     cliente_id: null,
@@ -34,7 +30,34 @@ export const VentaFormPage = () => {
     observaciones: "",
   };
 
+  const [clientes, setClientes] = useState([]);
+  const [vendedores, setVendedores] = useState([]);
+  const [serialesFiltrados, setSerialesFiltrados] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [venta, setVenta] = useState(emptyVenta);
+
+  // Agregamos esta función para poder recargar solo la venta sin resetear catálogos
+  const reloadVenta = async () => {
+    if (!id || id === "nueva") return;
+    try {
+      const resVenta = await api.get(`/ventas/${id}`);
+      const v = resVenta.data;
+      setVenta({
+        ...v,
+        fecha_venta: new Date(v.fecha_venta),
+        cliente_id: v.cliente_id.toString(),
+        serial_erp_id: v.serial_erp_id.toString(),
+        vendedor_id: v.vendedor_id ? Number(v.vendedor_id) : null,
+        valor_total: parseFloat(v.valor_total || 0),
+      });
+    } catch (e) {
+      console.error("Error al recargar venta " + e.response?.data?.error);
+    }
+  };
+
+  // Helper para formato de moneda local
+  const formatCur = (val) =>
+    (val || 0).toLocaleString("es-CO", { style: "currency", currency: "COP" });
 
   // UN SOLO useEffect para cargar todo
   useEffect(() => {
@@ -229,16 +252,74 @@ export const VentaFormPage = () => {
             <Button
               label="Cancelar"
               className="p-button-text"
+              icon="pi pi-times"
+              severity="danger"
               onClick={() => navigate("/ventas")}
             />
             <Button
               label="Guardar"
               icon="pi pi-check"
+              severity="success"
               loading={loading}
               onClick={onSave}
             />
           </div>
         </div>
+        {/* --- WIDGET DE RESUMEN Y PAGOS (Solo en edición) --- */}
+        {id && id !== "nueva" && (
+          <>
+            <hr className="my-5" />
+
+            {/* Solo mostramos el resumen si existe el objeto, pero PagosSeccion siempre si hay ID */}
+            {venta.resumen_financiero && (
+              <>
+                <h3 className="text-center mb-4 text-primary">
+                  Estado de Cuenta
+                </h3>
+                <div className="grid mb-4">
+                  <div className="col-12 md:col-4">
+                    <div className="p-3 border-round shadow-1 bg-blue-50 text-blue-800 text-center border-1 border-blue-200">
+                      <span className="block font-bold mb-2 uppercase text-xs">
+                        Valor Total
+                      </span>
+                      <span className="text-xl font-bold">
+                        {formatCur(venta.valor_total)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="col-12 md:col-4">
+                    <div className="p-3 border-round shadow-1 bg-green-50 text-green-800 text-center border-1 border-green-200">
+                      <span className="block font-bold mb-2 uppercase text-xs">
+                        Total Pagado
+                      </span>
+                      <span className="text-xl font-bold">
+                        {formatCur(venta.resumen_financiero.total_pagado)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="col-12 md:col-4">
+                    <div
+                      className={`p-3 border-round shadow-1 text-center border-1 ${
+                        venta.resumen_financiero.saldo_pendiente > 0
+                          ? "bg-red-50 text-red-800 border-red-200"
+                          : "bg-teal-50 text-teal-800 border-teal-200"
+                      }`}
+                    >
+                      <span className="block font-bold mb-2 uppercase text-xs">
+                        Saldo Pendiente
+                      </span>
+                      <span className="text-xl font-bold">
+                        {formatCur(venta.resumen_financiero.saldo_pendiente)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <PagosSeccion ventaId={id} onPagoRegistrado={reloadVenta} />
+          </>
+        )}
       </Card>
     </div>
   );

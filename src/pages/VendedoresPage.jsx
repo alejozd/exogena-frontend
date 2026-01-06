@@ -205,10 +205,16 @@ export const VendedoresPage = () => {
             <Button
               label="Cancelar"
               icon="pi pi-times"
+              severity="danger"
               text
               onClick={() => setVendedorDialog(false)}
             />
-            <Button label="Guardar" icon="pi pi-check" onClick={saveVendedor} />
+            <Button
+              label="Guardar"
+              icon="pi pi-check"
+              severity="success"
+              onClick={saveVendedor}
+            />
           </div>
         }
       >

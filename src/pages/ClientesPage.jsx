@@ -268,9 +268,15 @@ export const ClientesPage = () => {
               label="Cancelar"
               icon="pi pi-times"
               text
+              severity="danger"
               onClick={() => setClienteDialog(false)}
             />
-            <Button label="Guardar" icon="pi pi-check" onClick={saveCliente} />
+            <Button
+              label="Guardar"
+              icon="pi pi-check"
+              severity="success"
+              onClick={saveCliente}
+            />
           </div>
         }
       >

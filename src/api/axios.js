@@ -17,4 +17,20 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      console.warn("Sesión inválida o expirada. Limpiando...");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user"); // O como limpies tu sesión
+      window.location.href = "/login"; // Redirección forzosa
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

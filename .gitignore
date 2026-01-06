@@ -26,9 +26,9 @@ dist-ssr
 # Variables de entorno (¡MUY IMPORTANTE NO SUBIR ESTO!)
 .env
 .env.local
-.env.development.local
+.env.development
 .env.test.local
-.env.production.local
+.env.production
 
 # Logs
 npm-debug.log*

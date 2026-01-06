@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://exogena-api.zdevs.uk/api", // Cambia esto por tu URL de Laravel/Node
+  // baseURL: "https://exogena-api.zdevs.uk/api", // Cambia esto por tu URL de Laravel/Node
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

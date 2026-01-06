@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const api = axios.create({
-  // baseURL: "https://exogena-api.zdevs.uk/api", // Cambia esto por tu URL de Laravel/Node
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
   headers: {
     "Content-Type": "application/json",
@@ -9,7 +8,7 @@ const api = axios.create({
   },
 });
 
-// Configuración para enviar el Token automáticamente si existe
+// Interceptor de Peticiones
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -18,18 +17,37 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Interceptor de Respuestas
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (
-      error.response &&
-      (error.response.status === 401 || error.response.status === 403)
-    ) {
-      console.warn("Sesión inválida o expirada. Limpiando...");
-      localStorage.removeItem("token");
-      localStorage.removeItem("user"); // O como limpies tu sesión
-      window.location.href = "/login"; // Redirección forzosa
+    // Si no hay respuesta del servidor (error de red)
+    if (!error.response) {
+      console.error("Error de red o servidor no disponible");
+      return Promise.reject(error);
     }
+
+    const { status } = error.response;
+
+    // 401: Token expirado / No autorizado
+    // 403: Prohibido (aunque el token sea válido, no tienes permiso)
+    if (status === 401 || status === 403) {
+      // Evitamos redirigir si ya estamos en el login (para no crear bucles)
+      if (!window.location.pathname.includes("/login")) {
+        console.warn("Sesión inválida. Limpiando credenciales...");
+
+        // Limpiamos todo rastro de la sesión
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        // Opcional: Limpiar filtros guardados si quieres un reset total
+        // localStorage.removeItem("ventas_filtro_ano");
+
+        // Redirección inmediata
+        window.location.href = "/login";
+      }
+    }
+
     return Promise.reject(error);
   }
 );

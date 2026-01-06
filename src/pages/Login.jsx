@@ -2,10 +2,10 @@ import React, { useState, useRef } from "react";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
-import { Toast } from "primereact/toast"; // Para mensajes de error
+import { Toast } from "primereact/toast";
 import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios"; // Importamos tu config de axios
+import api from "../api/axios";
 import "../styles/Login.css";
 
 export const Login = () => {
@@ -17,8 +17,13 @@ export const Login = () => {
   const navigate = useNavigate();
   const toast = useRef(null);
 
+  // Nueva función para manejar el envío del formulario
+  const handleSubmit = (e) => {
+    e.preventDefault(); // EVITA que la página se recargue
+    handleLogin();
+  };
+
   const handleLogin = async () => {
-    // Validación básica
     if (!username || !password) {
       toast.current.show({
         severity: "warn",
@@ -30,24 +35,17 @@ export const Login = () => {
     }
 
     setLoading(true);
-
     try {
       const response = await api.post("/auth/login", {
         email: username,
         password: password,
       });
 
-      //   console.log("Respuesta de la API:", response.data);
-
-      // Mapeamos los nombres exactos que vimos en tu consola:
-      const user = response.data.usuario; // Tu API usa 'usuario'
-      const token = response.data.token; // Tu API usa 'token'
+      const user = response.data.usuario;
+      const token = response.data.token;
 
       if (token) {
-        // Ejecutamos el login del contexto
         login(user, token);
-
-        // Mensaje de éxito opcional antes de navegar
         toast.current.show({
           severity: "success",
           summary: "Bienvenido",
@@ -55,7 +53,6 @@ export const Login = () => {
           life: 2000,
         });
 
-        // Navegamos al dashboard
         setTimeout(() => {
           navigate("/dashboard");
         }, 500);
@@ -63,10 +60,7 @@ export const Login = () => {
         throw new Error("No se recibió un token del servidor");
       }
     } catch (error) {
-      console.error("Error detallado:", error);
-      const msg =
-        error.response?.data?.message ||
-        "Credenciales incorrectas o error de servidor";
+      const msg = error.response?.data?.message || "Credenciales incorrectas";
       toast.current.show({
         severity: "error",
         summary: "Error de acceso",
@@ -80,7 +74,7 @@ export const Login = () => {
 
   return (
     <div className="login-container">
-      <Toast ref={toast} /> {/* Contenedor de notificaciones */}
+      <Toast ref={toast} />
       <div className="login-content">
         <div className="login-logo">
           Exógena<span> 2025</span>
@@ -91,7 +85,8 @@ export const Login = () => {
             Control de Activaciones
           </h2>
 
-          <div className="flex flex-column gap-4">
+          {/* CAMBIO: Envolvemos todo en un form con onSubmit */}
+          <form onSubmit={handleSubmit} className="flex flex-column gap-4">
             <div className="custom-input-group">
               <i className="pi pi-user custom-icon" />
               <InputText
@@ -118,17 +113,17 @@ export const Login = () => {
             </div>
 
             <Button
+              type="submit" // IMPORTANTE: tipo submit para que Enter funcione
               label={loading ? "Verificando..." : "Entrar"}
               icon={loading ? "pi pi-spin pi-spinner" : "pi pi-sign-in"}
               className="w-full p-3 btn-gradient border-round-xl"
-              onClick={handleLogin}
               loading={loading}
             />
 
             <a href="#" className="text-center link-recovery text-sm">
               ¿Olvidaste tu contraseña? Recuperar
             </a>
-          </div>
+          </form>
         </div>
       </div>
     </div>

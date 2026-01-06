@@ -177,6 +177,45 @@ export const ClientesPage = () => {
     </div>
   );
 
+  const activacionesCountTemplate = (rowData) => {
+    const totalActivaciones =
+      rowData.ventas?.reduce((acc, venta) => {
+        return acc + (venta.activaciones?.length || 0);
+      }, 0) || 0;
+
+    // Definimos los estilos basados en la condición
+    const isZero = totalActivaciones === 0;
+
+    const badgeStyle = {
+      minWidth: "1.8rem",
+      height: "1.8rem",
+      borderRadius: "50%",
+      fontSize: "0.85rem",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontWeight: "bold",
+      // Cambio dinámico de colores
+      backgroundColor: isZero
+        ? "rgba(156, 163, 175, 0.1)"
+        : "rgba(59, 130, 246, 0.15)",
+      color: isZero ? "#9CA3AF" : "#60A5FA",
+      border: isZero ? "1px solid #4B5563" : "1px solid #3B82F6",
+      transition: "all 0.3s ease", // Suaviza el cambio si los datos se actualizan
+    };
+
+    return (
+      <div className="flex align-items-center justify-content-center">
+        <span
+          style={badgeStyle}
+          title={`El cliente tiene ${totalActivaciones} activaciones totales`}
+        >
+          {totalActivaciones}{" "}
+        </span>
+      </div>
+    );
+  };
+
   // HEADER COMPACTO INTEGRADO
   const renderHeader = () => {
     return (
@@ -235,6 +274,27 @@ export const ClientesPage = () => {
       >
         <Column field="nit" header="NIT" sortable></Column>
         <Column field="razon_social" header="Razón Social" sortable></Column>
+        <Column
+          header="Activaciones"
+          body={activacionesCountTemplate}
+          textAlign="center"
+          sortable
+          sortField="activaciones_count" // Campo virtual
+          sortFunction={(e) => {
+            const getCount = (data) =>
+              data.ventas?.reduce(
+                (acc, v) => acc + (v.activaciones?.length || 0),
+                0
+              ) || 0;
+
+            let result = [...e.data].sort((a, b) => {
+              let val1 = getCount(a);
+              let val2 = getCount(b);
+              return (val1 < val2 ? -1 : val1 > val2 ? 1 : 0) * e.order;
+            });
+            return result;
+          }}
+        ></Column>
         <Column field="email" header="Email" sortable></Column>
         <Column field="vendedores.nombre" header="Vendedor" sortable></Column>
         <Column

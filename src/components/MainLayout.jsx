@@ -22,6 +22,14 @@ export const MainLayout = () => {
       },
     },
     {
+      label: "Ventas",
+      icon: "pi pi-dollar",
+      command: () => {
+        navigate("/ventas");
+        setVisible(false);
+      },
+    },
+    {
       label: "Activaciones",
       icon: "pi pi-bolt",
       command: () => {

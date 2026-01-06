@@ -30,18 +30,26 @@ export const MainLayout = () => {
       },
     },
     {
-      label: "Usuarios",
-      icon: "pi pi-users",
-      command: () => {
-        navigate("/usuarios");
-        setVisible(false);
-      },
-    },
-    {
       label: "Vendedores",
       icon: "pi pi-id-card",
       command: () => {
         navigate("/vendedores");
+        setVisible(false);
+      },
+    },
+    {
+      label: "Clientes",
+      icon: "pi pi-users",
+      command: () => {
+        navigate("/clientes");
+        setVisible(false);
+      },
+    },
+    {
+      label: "Usuarios",
+      icon: "pi pi-users",
+      command: () => {
+        navigate("/usuarios");
         setVisible(false);
       },
     },

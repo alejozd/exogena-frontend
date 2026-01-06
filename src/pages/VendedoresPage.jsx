@@ -92,7 +92,6 @@ export const VendedoresPage = () => {
       <DataTable
         value={vendedores}
         loading={loading}
-        responsiveLayout="stack"
         breakpoint="960px"
         className="p-datatable-sm"
         stripedRows

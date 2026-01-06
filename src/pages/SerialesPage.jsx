@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Toolbar } from "primereact/toolbar";
+// Quitamos Toolbar de los imports si no se usa en otro lado
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { InputSwitch } from "primereact/inputswitch";
@@ -39,12 +39,10 @@ export const SerialesPage = () => {
     loadData();
   }, []);
 
-  // Función para manejar la búsqueda
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     let _filters = { ...filters };
     _filters["global"].value = value;
-
     setFilters(_filters);
     setGlobalFilterValue(value);
   };
@@ -57,7 +55,6 @@ export const SerialesPage = () => {
         api.get("/clientes"),
       ]);
       setSeriales(resSeriales.data);
-      // Formateamos clientes para que el dropdown muestre "NIT - Nombre"
       const clientesFormatted = resClientes.data.map((c) => ({
         label: `${c.nit} - ${c.razon_social}`,
         value: c.id,
@@ -80,12 +77,11 @@ export const SerialesPage = () => {
       toast.current.show({
         severity: "warn",
         summary: "Atención",
-        detail: "Todos los campos son obligatorios",
+        detail: "Campos obligatorios",
         life: 3000,
       });
       return;
     }
-
     try {
       if (serial.id) {
         await api.put(`/seriales/${serial.id}`, serial);
@@ -110,7 +106,7 @@ export const SerialesPage = () => {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: e.response?.data?.error || "Error al guardar",
+        detail: "Error al guardar " + e.response?.data?.error,
         life: 3000,
       });
     }
@@ -146,18 +142,6 @@ export const SerialesPage = () => {
     }
   };
 
-  const leftToolbarTemplate = () => (
-    <Button
-      label="Registrar Serial"
-      icon="pi pi-key"
-      severity="success"
-      onClick={() => {
-        setSerial(emptySerial);
-        setSerialDialog(true);
-      }}
-    />
-  );
-
   const statusBodyTemplate = (rowData) => (
     <Tag
       value={rowData.activo ? "ACTIVO" : "INACTIVO"}
@@ -186,23 +170,37 @@ export const SerialesPage = () => {
     </div>
   );
 
-  // Cabecera de la tabla con el buscador
+  // NUEVO HEADER COMPACTO
   const renderHeader = () => {
     return (
-      <div className="flex justify-content-between align-items-center">
-        <h2 className="text-white m-0 font-light">
+      <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
+        <h2 className="m-0 text-yellow font-light" style={{ color: "#FACC15" }}>
           Control de{" "}
-          <span className="font-bold text-yellow-400">Seriales ERP</span>
+          <span className="font-bold" style={{ color: "#FACC15" }}>
+            Seriales ERP
+          </span>
         </h2>
-        <IconField iconPosition="left">
-          <InputIcon className="pi pi-search" />
-          <InputText
-            value={globalFilterValue}
-            onChange={onGlobalFilterChange}
-            placeholder="Buscar por Serial, Cliente o NIT..."
-            className="p-inputtext-sm w-full md:w-20rem"
+        <div className="flex gap-2">
+          <IconField iconPosition="left">
+            <InputIcon className="pi pi-search" />
+            <InputText
+              value={globalFilterValue}
+              onChange={onGlobalFilterChange}
+              placeholder="Buscar..."
+              className="p-inputtext-sm w-full md:w-15rem"
+            />
+          </IconField>
+          <Button
+            label="Nuevo"
+            icon="pi pi-plus"
+            severity="success"
+            className="p-button-sm"
+            onClick={() => {
+              setSerial(emptySerial);
+              setSerialDialog(true);
+            }}
           />
-        </IconField>
+        </div>
       </div>
     );
   };
@@ -210,10 +208,9 @@ export const SerialesPage = () => {
   const header = renderHeader();
 
   return (
-    <div className="card shadow-2 p-4 border-round-xl bg-gray-900-alpha-10">
+    <div className="card shadow-2 p-3 border-round-xl bg-gray-900-alpha-10">
       <Toast ref={toast} />
       <ConfirmDialog />
-      <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
 
       <DataTable
         value={seriales}
@@ -221,14 +218,14 @@ export const SerialesPage = () => {
         stripedRows
         paginator
         rows={10}
-        header={header} // Agregamos la cabecera con el buscador
-        filters={filters} // Aplicamos los filtros
+        header={header} // Header compacto con botón integrado
+        filters={filters}
         globalFilterFields={[
           "serial_erp",
           "nombre_software",
           "clientes.razon_social",
           "clientes.nit",
-        ]} // CAMPOS DONDE BUSCAR
+        ]}
         className="p-datatable-sm"
         emptyMessage="No se encontraron seriales."
       >
@@ -245,8 +242,10 @@ export const SerialesPage = () => {
           sortField="clientes.razon_social"
           body={(rowData) => (
             <div>
-              <div className="font-bold">{rowData.clientes?.razon_social}</div>
-              <small className="text-gray-400">
+              <div className="font-bold text-blue-100">
+                {rowData.clientes?.razon_social}
+              </div>
+              <small className="text-gray-400 font-medium">
                 NIT: {rowData.clientes?.nit}
               </small>
             </div>
@@ -257,30 +256,30 @@ export const SerialesPage = () => {
           body={statusBodyTemplate}
           textAlign="center"
         ></Column>
-        <Column body={actionBodyTemplate} exportable={false}></Column>
+        <Column
+          body={actionBodyTemplate}
+          exportable={false}
+          style={{ width: "100px" }}
+        ></Column>
       </DataTable>
 
       <Dialog
         visible={serialDialog}
-        header={serial.id ? "Editar Serial" : "Nuevo Registro de Serial"}
+        header={serial.id ? "Editar Serial" : "Nuevo Registro"}
         modal
         className="p-fluid"
-        style={{ width: "450px" }}
+        style={{ width: "400px" }}
         onHide={() => setSerialDialog(false)}
         footer={
-          <>
+          <div className="flex justify-content-end gap-2">
             <Button
               label="Cancelar"
               icon="pi pi-times"
               text
               onClick={() => setSerialDialog(false)}
             />
-            <Button
-              label="Guardar Serial"
-              icon="pi pi-check"
-              onClick={saveSerial}
-            />
-          </>
+            <Button label="Guardar" icon="pi pi-check" onClick={saveSerial} />
+          </div>
         }
       >
         <div className="field mb-3">
@@ -289,19 +288,18 @@ export const SerialesPage = () => {
             value={serial.cliente_id}
             options={clientes}
             onChange={(e) => setSerial({ ...serial, cliente_id: e.value })}
-            placeholder="Seleccione un cliente"
-            filter // Habilita la búsqueda por texto
+            placeholder="Seleccione cliente"
+            filter
             showClear
           />
         </div>
         <div className="field mb-3">
-          <label className="font-bold">Nombre del Software</label>
+          <label className="font-bold">Software</label>
           <InputText
             value={serial.nombre_software}
             onChange={(e) =>
               setSerial({ ...serial, nombre_software: e.target.value })
             }
-            placeholder="Ej: Siigo, Helisa, SAP..."
           />
         </div>
         <div className="field mb-3">
@@ -311,11 +309,10 @@ export const SerialesPage = () => {
             onChange={(e) =>
               setSerial({ ...serial, serial_erp: e.target.value })
             }
-            placeholder="Ingrese el código de licencia"
           />
         </div>
         <div className="field flex align-items-center gap-3">
-          <label className="font-bold">¿Serial Habilitado?</label>
+          <label className="font-bold">Activo</label>
           <InputSwitch
             checked={serial.activo}
             onChange={(e) => setSerial({ ...serial, activo: e.value })}

@@ -48,19 +48,20 @@ export const VentaFormPage = () => {
           const resVenta = await api.get(`/ventas/${id}`);
           const v = resVenta.data;
 
-          // 1. Cargamos seriales primero
+          // 1. Cargamos seriales del cliente antes de setear la venta
           const resSer = await api.get(`/seriales/cliente/${v.cliente_id}`);
           setSerialesFiltrados(resSer.data);
 
-          // 2. Seteamos la venta asegurando que los IDs sean Strings
-          // Quitamos el Number() y usamos .toString() por seguridad
+          // 2. Seteamos la venta con los tipos de datos que tus catálogos esperan
           setVenta({
             ...v,
             fecha_venta: new Date(v.fecha_venta),
+            // Cliente y Serial como String (vienen de BigInt en el backend)
             cliente_id: v.cliente_id.toString(),
-            vendedor_id: v.vendedor_id ? Number(v.vendedor_id) : null,
             serial_erp_id: v.serial_erp_id.toString(),
-            valor_total: parseFloat(v.valor_total), // El valor total sí debe ser numérico
+            // Vendedor como Number (es un int estándar)
+            vendedor_id: v.vendedor_id ? Number(v.vendedor_id) : null,
+            valor_total: parseFloat(v.valor_total || 0),
           });
         } else {
           setVenta(emptyVenta);
@@ -80,11 +81,9 @@ export const VentaFormPage = () => {
 
   // Cargar seriales cuando cambie el cliente
   useEffect(() => {
-    // Solo disparar si hay un cliente_id seleccionado
+    // Solo cargar si el cliente_id existe y NO estamos en el proceso inicial de carga de una venta existente
     if (venta.cliente_id) {
       fetchSeriales(venta.cliente_id);
-    } else {
-      setSerialesFiltrados([]);
     }
   }, [venta.cliente_id]);
 

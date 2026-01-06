@@ -2,14 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Toolbar } from "primereact/toolbar";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { InputSwitch } from "primereact/inputswitch";
 import { Dropdown } from "primereact/dropdown";
 import { Tag } from "primereact/tag";
-import { Toast } from "primereact/toast"; // Importante
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog"; // Más elegante que window.confirm
+import { Toast } from "primereact/toast";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { IconField } from "primereact/iconfield"; // Para el buscador
+import { InputIcon } from "primereact/inputicon"; // Para el buscador
+import { FilterMatchMode } from "primereact/api"; // Para la lógica de filtrado
 import api from "../api/axios";
 
 export const ClientesPage = () => {
@@ -17,7 +19,11 @@ export const ClientesPage = () => {
   const [vendedores, setVendedores] = useState([]);
   const [clienteDialog, setClienteDialog] = useState(false);
   const [loading, setLoading] = useState(true);
-  const toast = useRef(null); // Referencia para el Toast
+  const [globalFilterValue, setGlobalFilterValue] = useState(""); // Estado del texto de búsqueda
+  const [filters, setFilters] = useState({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }, // Configuración del filtro
+  });
+  const toast = useRef(null);
 
   const emptyCliente = {
     nit: "",
@@ -34,6 +40,15 @@ export const ClientesPage = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Lógica para actualizar el filtro global
+  const onGlobalFilterChange = (e) => {
+    const value = e.target.value;
+    let _filters = { ...filters };
+    _filters["global"].value = value;
+    setFilters(_filters);
+    setGlobalFilterValue(value);
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -57,7 +72,6 @@ export const ClientesPage = () => {
   };
 
   const saveCliente = async () => {
-    // Validación básica antes de enviar
     if (!cliente.nit || !cliente.razon_social) {
       toast.current.show({
         severity: "warn",
@@ -92,7 +106,7 @@ export const ClientesPage = () => {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: e.response?.data?.error || "Error al guardar",
+        detail: "Error al guardar " + e.response?.data?.error,
         life: 3000,
       });
     }
@@ -116,7 +130,7 @@ export const ClientesPage = () => {
       toast.current.show({
         severity: "success",
         summary: "Eliminado",
-        detail: "Cliente borrado correctamente",
+        detail: "Cliente borrado",
         life: 3000,
       });
       loadData();
@@ -124,32 +138,19 @@ export const ClientesPage = () => {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "No se pudo eliminar el cliente " + e.response?.data?.error,
+        detail: "Error al eliminar " + e.response?.data?.error,
         life: 3000,
       });
     }
   };
 
   const editCliente = (c) => {
-    // Aseguramos que el vendedor_id sea un número para el Dropdown
     setCliente({
       ...c,
       vendedor_id: c.vendedor_id ? Number(c.vendedor_id) : null,
     });
     setClienteDialog(true);
   };
-
-  const leftToolbarTemplate = () => (
-    <Button
-      label="Nuevo Cliente"
-      icon="pi pi-plus"
-      severity="success"
-      onClick={() => {
-        setCliente(emptyCliente);
-        setClienteDialog(true);
-      }}
-    />
-  );
 
   const statusBodyTemplate = (rowData) => (
     <Tag
@@ -176,38 +177,84 @@ export const ClientesPage = () => {
     </div>
   );
 
+  // HEADER COMPACTO INTEGRADO
+  const renderHeader = () => {
+    return (
+      <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
+        <h2 className="m-0 font-light" style={{ color: "#3B82F6" }}>
+          Gestión de <span className="font-bold">Clientes</span>
+        </h2>
+        <div className="flex gap-2">
+          <IconField iconPosition="left">
+            <InputIcon className="pi pi-search" />
+            <InputText
+              value={globalFilterValue}
+              onChange={onGlobalFilterChange}
+              placeholder="Buscar NIT, Nombre, Email..."
+              className="p-inputtext-sm w-full md:w-15rem"
+            />
+          </IconField>
+          <Button
+            label="Nuevo"
+            icon="pi pi-plus"
+            severity="success"
+            className="p-button-sm"
+            onClick={() => {
+              setCliente(emptyCliente);
+              setClienteDialog(true);
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const header = renderHeader();
+
   return (
-    <div className="card shadow-2 p-4 border-round-xl bg-gray-900-alpha-10">
+    <div className="card shadow-2 p-3 border-round-xl bg-gray-900-alpha-10">
       <Toast ref={toast} />
       <ConfirmDialog />
-
-      <h2 className="text-white font-light">
-        Gestión de <span className="font-bold text-blue-400">Clientes</span>
-      </h2>
-
-      <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
 
       <DataTable
         value={clientes}
         loading={loading}
         stripedRows
-        className="p-datatable-sm"
         paginator
         rows={10}
+        header={header} // Header con búsqueda y botón nuevo
+        filters={filters} // Aplicación de los filtros
+        globalFilterFields={[
+          "nit",
+          "razon_social",
+          "email",
+          "vendedores.nombre",
+        ]} // Campos donde busca
+        className="p-datatable-sm"
+        emptyMessage="No se encontraron clientes."
       >
         <Column field="nit" header="NIT" sortable></Column>
         <Column field="razon_social" header="Razón Social" sortable></Column>
-        <Column field="email" header="Email"></Column>
+        <Column field="email" header="Email" sortable></Column>
         <Column field="vendedores.nombre" header="Vendedor" sortable></Column>
         <Column
           header="Seriales"
           body={(rowData) => rowData.seriales_erp?.length || 0}
           textAlign="center"
         ></Column>
-        <Column header="Estado" body={statusBodyTemplate}></Column>
-        <Column body={actionBodyTemplate} exportable={false}></Column>
+        <Column
+          header="Estado"
+          body={statusBodyTemplate}
+          textAlign="center"
+        ></Column>
+        <Column
+          body={actionBodyTemplate}
+          exportable={false}
+          style={{ width: "100px" }}
+        ></Column>
       </DataTable>
 
+      {/* DIALOG DE CLIENTES (Se mantiene igual a tu lógica) */}
       <Dialog
         visible={clienteDialog}
         header={cliente.id ? "Editar Cliente" : "Nuevo Cliente"}
@@ -216,7 +263,7 @@ export const ClientesPage = () => {
         style={{ width: "500px" }}
         onHide={() => setClienteDialog(false)}
         footer={
-          <>
+          <div className="flex justify-content-end gap-2">
             <Button
               label="Cancelar"
               icon="pi pi-times"
@@ -224,7 +271,7 @@ export const ClientesPage = () => {
               onClick={() => setClienteDialog(false)}
             />
             <Button label="Guardar" icon="pi pi-check" onClick={saveCliente} />
-          </>
+          </div>
         }
       >
         <div className="field mb-3">

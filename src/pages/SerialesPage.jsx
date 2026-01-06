@@ -175,10 +175,7 @@ export const SerialesPage = () => {
     return (
       <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
         <h2 className="m-0 text-yellow font-light" style={{ color: "#FACC15" }}>
-          Control de{" "}
-          <span className="font-bold" style={{ color: "#FACC15" }}>
-            Seriales ERP
-          </span>
+          Control de <span className="font-bold">Seriales ERP</span>
         </h2>
         <div className="flex gap-2">
           <IconField iconPosition="left">

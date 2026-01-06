@@ -64,6 +64,7 @@ export const AppRouter = () => {
           <Route path="/ventas" element={<VentasListPage />} />
           <Route path="/ventas/nueva" element={<VentaFormPage />} />
           <Route path="/ventas/editar/:id" element={<VentaFormPage />} />
+          <Route path="/ventas/detalle/:id" element={<VentaFormPage />} />
 
           {/* Aquí irás agregando más rutas protegidas:
             <Route path="/activaciones" element={<Activaciones />} /> 

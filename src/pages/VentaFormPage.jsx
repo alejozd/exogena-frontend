@@ -58,7 +58,6 @@ export const VentaFormPage = () => {
             ...v,
             fecha_venta: new Date(v.fecha_venta),
             cliente_id: v.cliente_id.toString(),
-            // vendedor_id: v.vendedor_id ? v.vendedor_id.toString() : null,
             vendedor_id: v.vendedor_id ? Number(v.vendedor_id) : null,
             serial_erp_id: v.serial_erp_id.toString(),
             valor_total: parseFloat(v.valor_total), // El valor total sí debe ser numérico

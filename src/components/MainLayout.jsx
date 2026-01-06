@@ -46,6 +46,14 @@ export const MainLayout = () => {
       },
     },
     {
+      label: "Seriales",
+      icon: "pi pi-key",
+      command: () => {
+        navigate("/seriales");
+        setVisible(false);
+      },
+    },
+    {
       label: "Usuarios",
       icon: "pi pi-users",
       command: () => {

@@ -4,6 +4,7 @@ import { Login } from "../pages/Login";
 import { Dashboard } from "../pages/Dashboard";
 import { VendedoresPage } from "../pages/VendedoresPage";
 import { ClientesPage } from "../pages/ClientesPage";
+import { SerialesPage } from "../pages/SerialesPage";
 import { MainLayout } from "../components/MainLayout";
 
 // Componente para proteger rutas
@@ -57,6 +58,7 @@ export const AppRouter = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/vendedores" element={<VendedoresPage />} />
           <Route path="/clientes" element={<ClientesPage />} />
+          <Route path="/seriales" element={<SerialesPage />} />
 
           {/* Aquí irás agregando más rutas protegidas:
             <Route path="/activaciones" element={<Activaciones />} /> 

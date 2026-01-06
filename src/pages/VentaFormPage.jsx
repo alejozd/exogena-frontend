@@ -46,21 +46,22 @@ export const VentaFormPage = () => {
 
         if (id && id !== "nueva" && !isNaN(id)) {
           const resVenta = await api.get(`/ventas/${id}`);
-          console.log("resVenta: ", resVenta);
           const v = resVenta.data;
 
-          // --- SOLUCIÓN AQUÍ ---
-          // Antes de setear la venta, cargamos los seriales del cliente de esa venta
-          // para que cuando el Dropdown se renderice, ya tenga las opciones disponibles.
+          // 1. Cargamos seriales primero
           const resSer = await api.get(`/seriales/cliente/${v.cliente_id}`);
           setSerialesFiltrados(resSer.data);
 
+          // 2. Seteamos la venta asegurando que los IDs sean Strings
+          // Quitamos el Number() y usamos .toString() por seguridad
           setVenta({
             ...v,
             fecha_venta: new Date(v.fecha_venta),
-            cliente_id: Number(v.cliente_id),
+            cliente_id: v.cliente_id.toString(),
+            // vendedor_id: v.vendedor_id ? v.vendedor_id.toString() : null,
             vendedor_id: v.vendedor_id ? Number(v.vendedor_id) : null,
-            serial_erp_id: Number(v.serial_erp_id),
+            serial_erp_id: v.serial_erp_id.toString(),
+            valor_total: parseFloat(v.valor_total), // El valor total sí debe ser numérico
           });
         } else {
           setVenta(emptyVenta);
@@ -80,10 +81,11 @@ export const VentaFormPage = () => {
 
   // Cargar seriales cuando cambie el cliente
   useEffect(() => {
-    // Solo ejecutamos esto si el usuario cambia el cliente manualmente,
-    // no necesitamos que corra durante la carga inicial de edición porque ya lo hicimos arriba.
-    if (venta.cliente_id && serialesFiltrados.length === 0) {
+    // Solo disparar si hay un cliente_id seleccionado
+    if (venta.cliente_id) {
       fetchSeriales(venta.cliente_id);
+    } else {
+      setSerialesFiltrados([]);
     }
   }, [venta.cliente_id]);
 

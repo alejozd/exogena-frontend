@@ -10,6 +10,7 @@ export const GenerarClavePage = () => {
   const [serial, setSerial] = useState("");
   const [resultado, setResultado] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const toast = useRef(null);
 
   const handleGenerar = async () => {
@@ -26,16 +27,27 @@ export const GenerarClavePage = () => {
     try {
       const response = await api.post("/generar-clave", { serial });
       setResultado(response.data);
+      setError(null); // Limpiamos errores previos
       toast.current.show({
         severity: "success",
         summary: "Éxito",
         detail: "Clave generada correctamente",
       });
     } catch (error) {
+      console.error("Error capturado:", error);
+
+      // Extraemos el mensaje del backend: error.response.data.error
+      const mensajeError =
+        error.response?.data?.error || "Error inesperado en el servidor";
+
+      setResultado(null); // Limpiamos resultados previos si falla
+      setError(mensajeError);
+
       toast.current.show({
         severity: "error",
-        summary: "Error",
-        detail: error.response?.data?.error || "Error al procesar la solicitud",
+        summary: "No se pudo generar",
+        detail: mensajeError,
+        life: 5000, // Le damos más tiempo para que el usuario lo lea
       });
     } finally {
       setLoading(false);
@@ -79,14 +91,27 @@ export const GenerarClavePage = () => {
               placeholder="Pega aquí el código del sistema..."
             />
             <Button
-              label="Generar Clave"
+              label={loading ? "Generando..." : "Generar Clave"}
               icon={loading ? "pi pi-spin pi-spinner" : "pi pi-key"}
               onClick={handleGenerar}
               disabled={loading}
               className="mt-2 w-full md:w-auto align-self-end"
             />
           </div>
+          {/* --- SECCIÓN DE ERROR --- */}
+          {error && (
+            <div className="mt-4 fadein">
+              <div className="flex align-items-center justify-content-center p-3 border-round bg-red-50 border-1 border-red-200">
+                <i
+                  className="pi pi-exclamation-circle text-red-500 mr-2"
+                  style={{ fontSize: "1.2rem" }}
+                ></i>
+                <span className="text-red-700 font-medium">{error}</span>
+              </div>
+            </div>
+          )}
 
+          {/* --- SECCIÓN DE RESULTADO --- */}
           {resultado && (
             <div className="mt-5 fadein animation-duration-500">
               <Divider align="left">

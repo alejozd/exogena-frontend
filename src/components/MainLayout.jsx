@@ -38,6 +38,14 @@ export const MainLayout = () => {
       },
     },
     {
+      label: "Generar Clave",
+      icon: "pi pi-key",
+      command: () => {
+        navigate("/generar-clave");
+        setVisible(false);
+      },
+    },
+    {
       label: "Vendedores",
       icon: "pi pi-id-card",
       command: () => {

@@ -149,17 +149,23 @@ export const GenerarClavePage = () => {
                     <label className="block text-primary font-bold mb-2">
                       Clave de Activación Generada
                     </label>
-                    <div className="flex gap-2">
-                      <div className="surface-0 p-3 border-round border-1 border-primary text-primary font-bold flex-grow-1 text-center text-xl shadow-1">
+                    <div className="flex flex-column md:flex-row gap-2">
+                      <div
+                        className="surface-0 p-2 md:p-3 border-round border-1 border-primary text-primary font-bold flex-grow-1 text-center text-lg md:text-xl shadow-1"
+                        style={{
+                          wordBreak: "break-all", // Rompe el texto para que no se desborde
+                          lineHeight: "1.5",
+                        }}
+                      >
                         {resultado.claveGenerada}
                       </div>
                       <Button
                         icon="pi pi-copy"
-                        className="p-button-outlined"
+                        label="Copiar" // Agregamos label para que sea más fácil de tocar en móvil
+                        className="p-button-outlined w-full md:w-auto"
                         onClick={() =>
                           copiarAlPortapapeles(resultado.claveGenerada)
                         }
-                        tooltip="Copiar Clave"
                       />
                     </div>
                   </div>

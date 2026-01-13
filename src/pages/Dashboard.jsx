@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 import { Skeleton } from "primereact/skeleton";
-import { Dropdown } from "primereact/dropdown"; // Importamos el Dropdown
+import { Dropdown } from "primereact/dropdown";
 import "../styles/Dashboard.css";
 
 export const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Estado para el año seleccionado (puedes poner 2024 o dinámico)
   const [selectedYear, setSelectedYear] = useState(2024);
 
-  // Opciones para el selector
   const years = [
     { label: "Año 2023", value: 2023 },
     { label: "Año 2024", value: 2024 },
@@ -20,9 +17,8 @@ export const Dashboard = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      setLoading(true); // Mostramos skeleton al cambiar de año
+      setLoading(true);
       try {
-        // Ahora pasamos el parámetro ?ano= al backend
         const response = await api.get(`/dashboard/stats?ano=${selectedYear}`);
         setData(response.data);
       } catch (error) {
@@ -32,7 +28,7 @@ export const Dashboard = () => {
       }
     };
     fetchStats();
-  }, [selectedYear]); // Se vuelve a ejecutar cuando selectedYear cambie
+  }, [selectedYear]);
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("es-CO", {
@@ -42,7 +38,6 @@ export const Dashboard = () => {
     }).format(value || 0);
   };
 
-  // Mapeo de tarjetas (se mantiene igual, pero ahora los datos dependen del filtro)
   const stats = [
     {
       label: "CLIENTES ACTIVOS",
@@ -78,7 +73,6 @@ export const Dashboard = () => {
 
   return (
     <div className="grid">
-      {/* Cabecera con Título y Selector */}
       <div className="col-12 mt-2 mb-4 flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
           <h2 className="text-white font-light m-0">
@@ -98,11 +92,7 @@ export const Dashboard = () => {
             options={years}
             onChange={(e) => setSelectedYear(e.value)}
             placeholder="Seleccionar Año"
-            className="w-full md:w-12rem"
-            style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-            }}
+            className="w-full md:w-12rem custom-dropdown"
           />
         </div>
       </div>
@@ -117,19 +107,11 @@ export const Dashboard = () => {
         </div>
       ) : (
         <>
-          {/* Tarjetas de Estadísticas */}
           {stats.map((item, index) => (
             <div key={index} className="col-12 sm:col-6 lg:col-3">
               <div
                 className="p-3 shadow-4 border-round-xl stat-card"
-                style={{
-                  background:
-                    "linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderLeft: `4px solid ${item.color}`,
-                  backdropFilter: "blur(10px)",
-                  height: "100%",
-                }}
+                style={{ "--card-color": item.color }} // Inyectamos el color dinámico aquí
               >
                 <div className="flex align-items-center mb-3">
                   <i
@@ -155,19 +137,12 @@ export const Dashboard = () => {
             </div>
           ))}
 
-          {/* Sección de Gráfica (Placeholder) */}
           <div className="col-12 mt-4">
-            <div
-              className="p-4 border-round-xl"
-              style={{
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.05)",
-              }}
-            >
+            <div className="p-4 border-round-xl chart-container">
               <h3 className="text-white font-light mb-4">
                 Ventas por Año Gravable
               </h3>
-              <div className="flex align-items-center justify-content-center h-10rem border-1 border-white-alpha-10 border-dashed border-round text-center">
+              <div className="flex align-items-center justify-content-center h-10rem chart-placeholder border-round text-center">
                 <span className="text-gray-500">
                   Total Histórico en {selectedYear}: <br />
                   <span className="text-white text-xl font-bold">

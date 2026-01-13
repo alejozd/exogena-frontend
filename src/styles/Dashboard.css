@@ -1,6 +1,15 @@
 /* src/styles/Dashboard.css */
 
 .stat-card {
+    /* Estilos base movidos de Dashboard.jsx */
+    background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--card-color); /* Usamos la variable inyectada */    
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);        
+    height: 100%;
+    
+    /* Animación y comportamiento */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     position: relative;
@@ -9,12 +18,12 @@
 
 /* Efecto al pasar el mouse */
 .stat-card:hover {
-    transform: translateY(-5px); /* Eleva la tarjeta */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); /* Sombra más profunda */
-    border: 1px solid rgba(255, 255, 255, 0.2) !important; /* Brillo en el borde */
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Reflejo de luz sutil que cruza la tarjeta al hacer hover */
+/* El destello de luz (Shine effect) */
 .stat-card::after {
     content: "";
     position: absolute;
@@ -33,4 +42,14 @@
 
 .stat-card:hover::after {
     left: 100%;
+}
+
+/* Estilo para el contenedor de la gráfica */
+.chart-container {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.chart-placeholder {
+    border: 1px dashed rgba(255, 255, 255, 0.1);
 }

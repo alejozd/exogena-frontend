@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 import { Skeleton } from "primereact/skeleton";
 import { Dropdown } from "primereact/dropdown"; // Importamos el Dropdown
+import "../styles/Dashboard.css";
 
 export const Dashboard = () => {
   const [data, setData] = useState(null);
@@ -120,7 +121,7 @@ export const Dashboard = () => {
           {stats.map((item, index) => (
             <div key={index} className="col-12 sm:col-6 lg:col-3">
               <div
-                className="p-3 shadow-4 border-round-xl"
+                className="p-3 shadow-4 border-round-xl stat-card"
                 style={{
                   background:
                     "linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)",

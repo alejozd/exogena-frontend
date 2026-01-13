@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 import { Skeleton } from "primereact/skeleton";
 import { Dropdown } from "primereact/dropdown";
+import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
 
 export const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState(2024);
+  const navigate = useNavigate();
 
   const years = [
     { label: "Año 2023", value: 2023 },
@@ -45,6 +47,7 @@ export const Dashboard = () => {
       subValue: `${data?.resumen?.vendedores || 0} Vendedores`,
       color: "#4facfe",
       icon: "pi-users",
+      route: "/clientes",
     },
     {
       label: "FACTURACIÓN TOTAL",
@@ -52,6 +55,7 @@ export const Dashboard = () => {
       subValue: `Ventas registradas en ${selectedYear}`,
       color: "#4dfb97",
       icon: "pi-money-bill",
+      route: "/ventas",
     },
     {
       label: "RECAUDO",
@@ -61,6 +65,7 @@ export const Dashboard = () => {
       )}% de efectividad`,
       color: "#feb47b",
       icon: "pi-percentage",
+      route: "/pagos",
     },
     {
       label: "CARTERA PENDIENTE",
@@ -68,6 +73,7 @@ export const Dashboard = () => {
       subValue: "Cobros por realizar",
       color: "#f75c5c",
       icon: "pi-calendar-times",
+      route: "/ventas",
     },
   ];
 
@@ -112,6 +118,7 @@ export const Dashboard = () => {
               <div
                 className="p-3 shadow-4 border-round-xl stat-card"
                 style={{ "--card-color": item.color }} // Inyectamos el color dinámico aquí
+                onClick={() => navigate(item.route)}
               >
                 <div className="flex align-items-center mb-3">
                   <i

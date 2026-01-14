@@ -53,3 +53,75 @@
 .chart-placeholder {
     border: 1px dashed rgba(255, 255, 255, 0.1);
 }
+
+.chart-container {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.bg-white-alpha-10 {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.p-progressbar {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+}
+
+.p-progressbar .p-progressbar-value {
+    box-shadow: 0 0 15px var(--card-color);
+}
+
+/* Ajustes para el MeterGroup */
+.p-metergroup .p-metergroup-meter {
+    height: 12px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.p-metergroup-label-list {
+    gap: 1.5rem;
+}
+
+.p-metergroup-label {
+    color: #9ca3af !important; /* Texto gris claro */
+    font-size: 0.9rem;
+}
+
+.p-metergroup-label-icon {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+/* Efecto de cristal para el contenedor informativo */
+.bg-blue-900-alpha-10 {
+    background: rgba(30, 132, 246, 0.05);
+}
+
+.chart-container {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Fix para visibilidad del MeterGroup en fondo oscuro */
+.p-metergroup .p-metergroup-meter {
+    background-color: rgba(255, 255, 255, 0.05);
+    height: 12px;
+    border-radius: 10px;
+}
+
+.p-metergroup-label-text {
+    color: #e5e7eb !important;
+}
+
+.bg-blue-900-alpha-10 {
+    background: rgba(30, 132, 246, 0.1);
+}
+
+.border-blue-900-alpha-30 {
+    border-color: rgba(30, 132, 246, 0.3);
+}

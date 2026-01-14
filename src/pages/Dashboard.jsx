@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import api from "../api/axios";
 import { Skeleton } from "primereact/skeleton";
 import { Dropdown } from "primereact/dropdown";
+import { Chart } from "primereact/chart";
+import { MeterGroup } from "primereact/metergroup";
 import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
 
@@ -9,6 +11,8 @@ export const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState(2024);
+  const [chartData, setChartData] = useState({});
+  const [chartOptions, setChartOptions] = useState({});
   const navigate = useNavigate();
 
   const years = [
@@ -16,21 +20,6 @@ export const Dashboard = () => {
     { label: "Año 2024", value: 2024 },
     { label: "Año 2025", value: 2025 },
   ];
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get(`/dashboard/stats?ano=${selectedYear}`);
-        setData(response.data);
-      } catch (error) {
-        console.error("Error cargando estadísticas", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStats();
-  }, [selectedYear]);
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("es-CO", {
@@ -40,71 +29,139 @@ export const Dashboard = () => {
     }).format(value || 0);
   };
 
+  const prepareChart = (facturado, recaudado) => {
+    const dataConfig = {
+      labels: ["Análisis Financiero"],
+      datasets: [
+        {
+          label: "Facturado",
+          backgroundColor: "#60A5FA",
+          data: [facturado],
+        },
+        {
+          label: "Recaudado",
+          backgroundColor: "#34D399",
+          data: [recaudado],
+        },
+      ],
+    };
+
+    const optionsConfig = {
+      maintainAspectRatio: false,
+      aspectRatio: 0.8,
+      plugins: {
+        legend: { labels: { color: "#9ca3af", font: { size: 12 } } },
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: {
+          ticks: { color: "#9ca3af" },
+          grid: { color: "rgba(255, 255, 255, 0.05)" },
+        },
+      },
+    };
+
+    setChartData(dataConfig);
+    setChartOptions(optionsConfig);
+  };
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get(`/dashboard/stats?ano=${selectedYear}`);
+        setData(response.data);
+        // Configuramos el gráfico con los nuevos datos
+        prepareChart(
+          response.data.finanzas.total_facturado,
+          response.data.finanzas.total_recaudado
+        );
+      } catch (error) {
+        console.error("Error cargando estadísticas", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, [selectedYear]);
+
+  const getMeterData = () => {
+    const total = data?.finanzas?.total_facturado || 1;
+    const recaudado = data?.finanzas?.total_recaudado || 0;
+    const pendiente = data?.finanzas?.cartera_pendiente || 0;
+
+    return [
+      {
+        label: "Recaudado",
+        value: Number(((recaudado * 100) / total).toFixed(1)),
+        color: "#34D399",
+        icon: "pi pi-check-circle",
+      },
+      {
+        label: "Pendiente",
+        value: Number(((pendiente * 100) / total).toFixed(1)),
+        color: "#F87171",
+        icon: "pi pi-clock",
+      },
+    ];
+  };
+
   const stats = [
     {
       label: "CLIENTES ACTIVOS",
       value: data?.resumen?.clientes || 0,
       subValue: `${data?.resumen?.vendedores || 0} Vendedores`,
-      color: "#4facfe",
+      color: "#60A5FA",
       icon: "pi-users",
       route: "/clientes",
     },
     {
       label: "FACTURACIÓN TOTAL",
       value: formatCurrency(data?.finanzas?.total_facturado),
-      subValue: `Ventas registradas en ${selectedYear}`,
-      color: "#4dfb97",
+      subValue: `Ventas registradas`,
+      color: "#34D399",
       icon: "pi-money-bill",
       route: "/ventas",
     },
     {
       label: "RECAUDO",
       value: formatCurrency(data?.finanzas?.total_recaudado),
-      subValue: `${(data?.finanzas?.porcentaje_recaudo || 0).toFixed(
+      subValue: `${data?.finanzas?.porcentaje_recaudo?.toFixed(
         1
-      )}% de efectividad`,
-      color: "#feb47b",
+      )}% efectividad`,
+      color: "#FB923C",
       icon: "pi-percentage",
       route: "/pagos",
     },
     {
       label: "CARTERA PENDIENTE",
       value: formatCurrency(data?.finanzas?.cartera_pendiente),
-      subValue: "Cobros por realizar",
-      color: "#f75c5c",
+      subValue: "Cobros pendientes",
+      color: "#F87171",
       icon: "pi-calendar-times",
       route: "/ventas",
     },
   ];
 
   return (
-    <div className="grid">
-      <div className="col-12 mt-2 mb-4 flex justify-content-between align-items-center flex-wrap gap-3">
-        <div>
-          <h2 className="text-white font-light m-0">
+    <div className="grid p-2">
+      <div className="col-12 mb-2 flex justify-content-between align-items-center flex-wrap gap-3">
+        <div style={{ color: "#f49a0a" }}>
+          <h2 className="font-light m-0">
             Estado <span className="font-bold text-blue-400">Financiero</span>
           </h2>
-          <small className="text-gray-500">
-            Información de Exógena {selectedYear}
-          </small>
+          <small className="text-gray-500">Exógena {selectedYear}</small>
         </div>
-
-        <div className="flex align-items-center gap-3">
-          <span className="text-gray-400 text-sm hidden sm:inline">
-            Filtrar por:
-          </span>
-          <Dropdown
-            value={selectedYear}
-            options={years}
-            onChange={(e) => setSelectedYear(e.value)}
-            placeholder="Seleccionar Año"
-            className="w-full md:w-12rem custom-dropdown"
-          />
-        </div>
+        <Dropdown
+          value={selectedYear}
+          options={years}
+          onChange={(e) => setSelectedYear(e.value)}
+          className="w-full md:w-12rem custom-dropdown"
+        />
       </div>
 
       {loading ? (
-        <div className="grid col-12 p-0">
+        <div className="grid col-12">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="col-12 sm:col-6 lg:col-3">
               <Skeleton height="120px" borderRadius="12px" />
@@ -117,45 +174,72 @@ export const Dashboard = () => {
             <div key={index} className="col-12 sm:col-6 lg:col-3">
               <div
                 className="p-3 shadow-4 border-round-xl stat-card"
-                style={{ "--card-color": item.color }} // Inyectamos el color dinámico aquí
+                style={{ "--card-color": item.color }}
                 onClick={() => navigate(item.route)}
               >
                 <div className="flex align-items-center mb-3">
                   <i
                     className={`pi ${item.icon} mr-2`}
-                    style={{ color: item.color, fontSize: "0.9rem" }}
+                    style={{ color: item.color }}
                   ></i>
                   <span
-                    className="text-xs font-bold tracking-wider"
+                    className="text-xs font-bold"
                     style={{ color: item.color }}
                   >
                     {item.label}
                   </span>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-white mb-1">
-                    {item.value}
-                  </div>
-                  <div className="text-xs text-gray-400 font-medium">
-                    {item.subValue}
-                  </div>
+                <div className="text-2xl font-bold text-white">
+                  {item.value}
+                </div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {item.subValue}
                 </div>
               </div>
             </div>
           ))}
 
-          <div className="col-12 mt-4">
-            <div className="p-4 border-round-xl chart-container">
+          <div className="col-12 lg:col-7 mt-4">
+            <div className="p-4 border-round-xl chart-container h-full">
               <h3 className="text-white font-light mb-4">
-                Ventas por Año Gravable
+                Tendencia de Ventas
               </h3>
-              <div className="flex align-items-center justify-content-center h-10rem chart-placeholder border-round text-center">
-                <span className="text-gray-500">
-                  Total Histórico en {selectedYear}: <br />
-                  <span className="text-white text-xl font-bold">
-                    {formatCurrency(data?.finanzas?.total_facturado)}
+              <Chart
+                type="bar"
+                data={chartData}
+                options={chartOptions}
+                className="h-20rem"
+              />
+            </div>
+          </div>
+
+          <div className="col-12 lg:col-5 mt-4">
+            <div className="p-4 border-round-xl chart-container h-full">
+              <h3 className="text-white font-light mb-5">
+                Composición de Cartera
+              </h3>
+              <div className="mb-5">
+                <div className="text-4xl font-bold text-white">
+                  {formatCurrency(data?.finanzas?.total_facturado)}
+                </div>
+                <p className="text-gray-500 text-sm">
+                  Distribución de ingresos
+                </p>
+              </div>
+
+              <MeterGroup values={getMeterData()} labelOrientation="vertical" />
+
+              <div className="mt-6 p-3 border-round bg-blue-900-alpha-10 border-1 border-blue-900-alpha-30">
+                <div className="flex align-items-center gap-2 text-blue-300">
+                  <i className="pi pi-info-circle"></i>
+                  <span className="text-sm">
+                    Faltan{" "}
+                    <strong>
+                      {formatCurrency(data?.finanzas?.cartera_pendiente)}
+                    </strong>{" "}
+                    por recaudar.
                   </span>
-                </span>
+                </div>
               </div>
             </div>
           </div>

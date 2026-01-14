@@ -70,6 +70,14 @@ export const MainLayout = () => {
       },
     },
     {
+      label: "Pagos",
+      icon: "pi pi-credit-card",
+      command: () => {
+        navigate("/pagos");
+        setVisible(false);
+      },
+    },
+    {
       label: "Usuarios",
       icon: "pi pi-users",
       command: () => {

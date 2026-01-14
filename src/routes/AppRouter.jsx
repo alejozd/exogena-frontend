@@ -9,6 +9,7 @@ import { ActivacionesPage } from "../pages/Activaciones";
 import { GenerarClavePage } from "../pages/GenerarClavePage";
 import { VentasListPage } from "../pages/VentasListPage";
 import { VentaFormPage } from "../pages/VentaFormPage";
+import { PagosPage } from "../pages/PagosPage";
 import { MainLayout } from "../components/MainLayout";
 
 // Componente para proteger rutas
@@ -69,6 +70,7 @@ export const AppRouter = () => {
           <Route path="/ventas/nueva" element={<VentaFormPage />} />
           <Route path="/ventas/editar/:id" element={<VentaFormPage />} />
           <Route path="/ventas/detalle/:id" element={<VentaFormPage />} />
+          <Route path="/pagos" element={<PagosPage />} />
 
           {/* Aquí irás agregando más rutas protegidas:
             <Route path="/activaciones" element={<Activaciones />} /> 

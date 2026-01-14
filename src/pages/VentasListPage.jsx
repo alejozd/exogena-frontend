@@ -183,13 +183,6 @@ export const VentasListPage = () => {
           body={(rd) => (
             <div className="flex gap-2">
               <Button
-                icon="pi pi-eye"
-                rounded
-                outlined
-                severity="info"
-                onClick={() => navigate(`/ventas/detalle/${rd.id}`)}
-              />
-              <Button
                 icon="pi pi-pencil"
                 rounded
                 outlined

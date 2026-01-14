@@ -65,7 +65,7 @@ export const Dashboard = () => {
       )}% de efectividad`,
       color: "#feb47b",
       icon: "pi-percentage",
-      route: "/pagos",
+      // route: "/pagos",
     },
     {
       label: "CARTERA PENDIENTE",

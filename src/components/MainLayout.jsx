@@ -89,7 +89,7 @@ export const MainLayout = () => {
       <Avatar
         icon="pi pi-user"
         shape="circle"
-        className="bg-blue-500 text-white"
+        style={{ backgroundColor: "#6ee4fc", color: "black" }}
       />
     </div>
   );

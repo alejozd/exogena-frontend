@@ -1,0 +1,44 @@
+/* src/styles/GenerarClave.css */
+
+.clave-container {
+    padding-top: 2rem; /* Ya no se centra verticalmente al 100% para que no quede tan abajo */
+    display: flex;
+    justify-content: center;
+    min-h-screen: 100vh;
+}
+
+.card-neon {
+    background-color: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+/* Efecto glow al enfocar el textarea */
+.input-neon:focus {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5) !important;
+    border-color: #3B82F6 !important;
+}
+
+.btn-gradient {
+    background: linear-gradient(90deg, #3B82F6 0%, #10B981 100%) !important;
+    border: none !important;
+}
+
+.btn-gradient:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.clave-resultado-box {
+    background-color: rgba(16, 185, 129, 0.05);
+    border: 1px dashed #10B981;
+}
+
+/* Tipografía mono para códigos */
+.font-code {
+    font-family: 'Monaco', 'Consolas', monospace;
+    letter-spacing: 1px;
+}

@@ -155,7 +155,7 @@ export const GenerarClavePage = () => {
                     <span className="block text-gray-500 text-xs font-bold uppercase mb-1">
                       Dirección Física (MAC)
                     </span>
-                    <span className="text-sm font-code text-gray-400 break-all">
+                    <span className="text-md font-code text-gray-400 break-all">
                       {resultado.macServidor}
                     </span>
                   </div>
@@ -166,17 +166,17 @@ export const GenerarClavePage = () => {
                     <label className="block text-emerald-400 font-bold mb-3 text-center text-sm tracking-widest">
                       KEY CODE GENERADO
                     </label>
-                    <div className="flex flex-column lg:flex-row gap-3">
-                      <div
-                        className="bg-black-alpha-90 p-3 border-round-lg text-emerald-400 font-bold text-center text-3xl shadow-inner border-1 border-emerald-900 flex-grow-1 font-code"
-                        style={{ wordBreak: "break-all" }}
-                      >
+
+                    {/* Cambiamos a un layout que maneja mejor el espacio del botón */}
+                    <div className="flex flex-column md:flex-row gap-3 align-items-stretch md:align-items-center">
+                      <div className="bg-black-alpha-90 p-3 border-round-lg text-emerald-400 font-bold text-center text-xl md:text-3xl shadow-inner border-1 border-emerald-900 flex-grow-1 font-code clave-display">
                         {resultado.claveGenerada}
                       </div>
+
                       <Button
                         icon="pi pi-copy"
                         label="COPIAR"
-                        className="p-button-success p-button-outlined font-bold px-4"
+                        className="p-button-success p-button-outlined font-bold btn-copiar-custom"
                         onClick={() =>
                           copiarAlPortapapeles(resultado.claveGenerada)
                         }

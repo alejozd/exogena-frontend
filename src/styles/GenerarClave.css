@@ -42,3 +42,23 @@
     font-family: 'Monaco', 'Consolas', monospace;
     letter-spacing: 1px;
 }
+
+.clave-resultado-box {
+    background-color: rgba(16, 185, 129, 0.05);
+    border: 1px dashed #10B981;
+}
+
+/* Evita que el botón se achique o el texto se salga */
+.btn-copiar-custom {
+    min-width: 140px; /* Ancho fijo para que el texto siempre quepa */
+    flex-shrink: 0;   /* Evita que el flexbox lo comprima */
+}
+
+/* Ajuste para el contenedor de la clave para que respete al botón */
+.clave-display {
+    word-break: break-all;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

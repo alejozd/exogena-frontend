@@ -71,12 +71,12 @@ export const GenerarClavePage = () => {
           className="shadow-3 border-round-xl overflow-hidden"
         >
           <p className="text-gray-600 mb-4 text-sm md:text-base">
-            Ingresa el serial en Base64 para obtener la clave de activación.
+            Ingresa el serial para obtener la clave de activación.
           </p>
 
           <div className="flex flex-column gap-2">
             <label htmlFor="serial" className="font-bold text-sm">
-              Serial ERP (Base64)
+              Serial ERP
             </label>
             <InputTextarea
               id="serial"

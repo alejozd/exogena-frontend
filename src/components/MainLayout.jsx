@@ -39,7 +39,7 @@ export const MainLayout = () => {
     },
     {
       label: "Generar Clave",
-      icon: "pi pi-key",
+      icon: "pi pi-code",
       command: () => {
         navigate("/generar-clave");
         setVisible(false);
@@ -77,14 +77,14 @@ export const MainLayout = () => {
         setVisible(false);
       },
     },
-    {
-      label: "Usuarios",
-      icon: "pi pi-users",
-      command: () => {
-        navigate("/usuarios");
-        setVisible(false);
-      },
-    },
+    // {
+    //   label: "Usuarios",
+    //   icon: "pi pi-users",
+    //   command: () => {
+    //     navigate("/usuarios");
+    //     setVisible(false);
+    //   },
+    // },
   ];
 
   // Contenido de la derecha en el Menubar

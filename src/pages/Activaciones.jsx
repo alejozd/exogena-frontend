@@ -12,6 +12,7 @@ import { Dropdown } from "primereact/dropdown";
 import api from "../api/axios";
 
 export const ActivacionesPage = () => {
+  const ALL_YEARS_VALUE = "ALL";
   const [activaciones, setActivaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -19,7 +20,7 @@ export const ActivacionesPage = () => {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
   const [anosOptions, setAnosOptions] = useState([
-    { label: "Todos los años", value: null },
+    { label: "Todos los años", value: ALL_YEARS_VALUE },
   ]); // Nuevo: opciones dinámicas
   const toast = useRef(null);
 
@@ -54,7 +55,10 @@ export const ActivacionesPage = () => {
         label: `Medios ${ano}`,
         value: ano,
       }));
-      setAnosOptions([{ label: "Todos los años", value: null }, ...options]);
+      setAnosOptions([
+        { label: "Todos los años", value: ALL_YEARS_VALUE },
+        ...options,
+      ]);
 
       // Nuevo: Filtro por defecto al año más reciente (ej., 2025 en 2026)
       if (uniqueAnos.length > 0) {
@@ -216,27 +220,21 @@ export const ActivacionesPage = () => {
             value={
               filters["ventas.ano_gravable"]
                 ? filters["ventas.ano_gravable"].value
-                : null
+                : ALL_YEARS_VALUE
             }
             options={anosOptions}
             onChange={(e) => {
-              console.log("Filtro seleccionado:", e.value); // ← depuración
-
               setFilters((current) => {
                 const updated = { ...current };
 
-                if (e.value === null) {
-                  console.log("Mostrando TODOS los años (filtro eliminado)");
+                if (e.value === ALL_YEARS_VALUE) {
                   delete updated["ventas.ano_gravable"];
                 } else {
-                  console.log(`Filtrando por año: ${e.value}`);
                   updated["ventas.ano_gravable"] = {
                     value: e.value,
                     matchMode: FilterMatchMode.EQUALS,
                   };
                 }
-
-                console.log("Filtros actualizados:", updated);
                 return updated;
               });
             }}
@@ -271,14 +269,14 @@ export const ActivacionesPage = () => {
         paginator
         rows={10}
         header={renderHeader()}
-        // filters={filters}
-        // globalFilterFields={[
-        //   "nombre_equipo",
-        //   "mac_servidor",
-        //   "ventas.clientes.razon_social",
-        //   "ventas.seriales_erp.serial_erp",
-        //   "ip_origen",
-        // ]}
+        filters={filters}
+        globalFilterFields={[
+          "nombre_equipo",
+          "mac_servidor",
+          "ventas.clientes.razon_social",
+          "ventas.seriales_erp.serial_erp",
+          "ip_origen",
+        ]}
         sortField="fecha_activacion"
         sortOrder={-1}
         className="p-datatable-sm"

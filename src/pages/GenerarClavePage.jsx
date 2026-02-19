@@ -35,10 +35,16 @@ export const GenerarClavePage = () => {
         detail: "Clave de activación generada con éxito",
       });
     } catch (error) {
-      const mensajeError =
-        error.response?.data?.error || "Error en el algoritmo de generación";
-      setResultado(null);
-      setError(mensajeError);
+      let mensajeError = "";
+      if (error.response?.status === 403) {
+        mensajeError = error.response.data.error;
+        setError(mensajeError);
+      } else {
+        mensajeError =
+          error.response?.data?.error || "Error en el algoritmo de generación";
+        setResultado(null);
+        setError(mensajeError);
+      }
       toast.current.show({
         severity: "error",
         summary: "Fallo de Generación",

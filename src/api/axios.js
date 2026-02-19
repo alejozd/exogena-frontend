@@ -31,7 +31,7 @@ api.interceptors.response.use(
 
     // 401: Token expirado / No autorizado
     // 403: Prohibido (aunque el token sea válido, no tienes permiso)
-    if (status === 401 || status === 403) {
+    if (status === 401) {
       // Evitamos redirigir si ya estamos en el login (para no crear bucles)
       if (!window.location.pathname.includes("/login")) {
         console.warn("Sesión inválida. Limpiando credenciales...");

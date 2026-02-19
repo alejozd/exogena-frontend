@@ -8,6 +8,7 @@ import { InputText } from "primereact/inputtext";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { FilterMatchMode } from "primereact/api";
+import { Dropdown } from "primereact/dropdown";
 import api from "../api/axios";
 
 export const ActivacionesPage = () => {
@@ -17,6 +18,9 @@ export const ActivacionesPage = () => {
   const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
+  const [anosOptions, setAnosOptions] = useState([
+    { label: "Todos los años", value: null },
+  ]); // Nuevo: opciones dinámicas
   const toast = useRef(null);
 
   useEffect(() => {
@@ -28,6 +32,41 @@ export const ActivacionesPage = () => {
     try {
       const response = await api.get("/activaciones");
       setActivaciones(response.data);
+
+      console.log("Total activaciones cargadas:", response.data.length);
+      console.log(
+        "Registros con ano_gravable definido:",
+        response.data.filter((item) => item.ventas?.ano_gravable != null)
+          .length,
+      );
+      console.log("Años únicos encontrados:", [
+        ...new Set(response.data.map((item) => item.ventas?.ano_gravable)),
+      ]);
+      // Nuevo: Extraer años gravables únicos y ordenarlos descendente
+      const uniqueAnos = [
+        ...new Set(
+          response.data
+            .map((item) => item.ventas?.ano_gravable)
+            .filter((a) => a != null),
+        ),
+      ].sort((a, b) => b - a);
+      const options = uniqueAnos.map((ano) => ({
+        label: `Medios ${ano}`,
+        value: ano,
+      }));
+      setAnosOptions([{ label: "Todos los años", value: null }, ...options]);
+
+      // Nuevo: Filtro por defecto al año más reciente (ej., 2025 en 2026)
+      if (uniqueAnos.length > 0) {
+        const latestAno = uniqueAnos[0];
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          "ventas.ano_gravable": {
+            value: latestAno,
+            matchMode: FilterMatchMode.EQUALS,
+          },
+        }));
+      }
     } catch (e) {
       toast.current.show({
         severity: "error",
@@ -79,7 +118,40 @@ export const ActivacionesPage = () => {
     }
   };
 
-  // Plantillas para las columnas
+  // Modificado: Colores basados en el año actual (new Date().getFullYear() - 1)
+  const anoGravableBodyTemplate = (rowData) => {
+    const ano = rowData.ventas?.ano_gravable;
+    if (!ano) return <span style={{ color: "#888" }}>N/A</span>;
+
+    const currentAno = new Date().getFullYear() - 1; // Ej., 2025 en 2026
+    const isCurrent = ano === currentAno;
+    const style = {
+      backgroundColor: isCurrent ? "#27eedeff" : "#64748b", // Turquesa para actual, gris para anteriores
+      color: isCurrent ? "#000000" : "#ffffff",
+      fontWeight: "bold",
+      padding: "4px 10px",
+      borderRadius: "4px",
+      fontSize: "0.8rem",
+      display: "inline-block",
+      minWidth: "60px",
+      textAlign: "center",
+      boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
+    };
+
+    return <span style={style}>{ano}</span>;
+  };
+
+  // Nuevo: Plantilla para ano_venta
+  const anoVentaBodyTemplate = (rowData) => {
+    const ano = rowData.ventas?.ano_venta;
+    return ano ? (
+      <span>{ano}</span>
+    ) : (
+      <span style={{ color: "#888" }}>N/A</span>
+    );
+  };
+
+  // Plantillas para las columnas (resto igual)
   const dateBodyTemplate = (rowData) => {
     return new Date(rowData.fecha_activacion).toLocaleString();
   };
@@ -125,25 +197,70 @@ export const ActivacionesPage = () => {
     />
   );
 
-  const renderHeader = () => (
-    <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
-      <h2 className="m-0 text-yellow font-light" style={{ color: "#27eedeff" }}>
-        Historial de <span className="font-bold">Activaciones</span>
-      </h2>
-      <IconField iconPosition="left">
-        <InputIcon className="pi pi-search" />
-        <InputText
-          value={globalFilterValue}
-          onChange={onGlobalFilterChange}
-          placeholder="Buscar por MAC, Cliente o Serial..."
-          className="p-inputtext-sm w-full md:w-20rem"
-        />
-      </IconField>
-    </div>
-  );
+  const renderHeader = () => {
+    return (
+      <div className="flex flex-wrap gap-2 justify-content-between align-items-center">
+        <h2 className="m-0 font-light" style={{ color: "#27eedeff" }}>
+          Historial de <span className="font-bold">Activaciones</span>
+          {filters["ventas.ano_gravable"]?.value && (
+            <span
+              style={{ fontSize: "0.9rem", opacity: 0.7, marginLeft: "12px" }}
+            >
+              (Mostrando solo Medios {filters["ventas.ano_gravable"].value})
+            </span>
+          )}
+        </h2>
+
+        <div className="flex gap-2">
+          <Dropdown
+            value={
+              filters["ventas.ano_gravable"]
+                ? filters["ventas.ano_gravable"].value
+                : null
+            }
+            options={anosOptions}
+            onChange={(e) => {
+              console.log("Filtro seleccionado:", e.value); // ← depuración
+
+              setFilters((current) => {
+                const updated = { ...current };
+
+                if (e.value === null) {
+                  console.log("Mostrando TODOS los años (filtro eliminado)");
+                  delete updated["ventas.ano_gravable"];
+                } else {
+                  console.log(`Filtrando por año: ${e.value}`);
+                  updated["ventas.ano_gravable"] = {
+                    value: e.value,
+                    matchMode: FilterMatchMode.EQUALS,
+                  };
+                }
+
+                console.log("Filtros actualizados:", updated);
+                return updated;
+              });
+            }}
+            placeholder="Filtrar por Año"
+            className="p-inputtext-sm"
+            style={{ width: "160px" }}
+          />
+
+          <IconField iconPosition="left">
+            <InputIcon className="pi pi-search" />
+            <InputText
+              value={globalFilterValue}
+              onChange={onGlobalFilterChange}
+              placeholder="Buscar..."
+              className="p-inputtext-sm w-full md:w-15rem"
+            />
+          </IconField>
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="card shadow-2 p-3 border-round-xl bg-gray-900-alpha-10">
+    <div className="card shadow-2 p-3 border-round-xl bg-gray-900">
       <Toast ref={toast} />
       <ConfirmDialog />
 
@@ -154,14 +271,16 @@ export const ActivacionesPage = () => {
         paginator
         rows={10}
         header={renderHeader()}
-        filters={filters}
-        globalFilterFields={[
-          "nombre_equipo",
-          "mac_servidor",
-          "ventas.clientes.razon_social",
-          "ventas.seriales_erp.serial_erp",
-          "ip_origen",
-        ]}
+        // filters={filters}
+        // globalFilterFields={[
+        //   "nombre_equipo",
+        //   "mac_servidor",
+        //   "ventas.clientes.razon_social",
+        //   "ventas.seriales_erp.serial_erp",
+        //   "ip_origen",
+        // ]}
+        sortField="fecha_activacion"
+        sortOrder={-1}
         className="p-datatable-sm"
         emptyMessage="No se encontraron registros de activación."
       >
@@ -171,13 +290,25 @@ export const ActivacionesPage = () => {
           sortable
           field="fecha_activacion"
         />
+        <Column
+          header="Año Gravable"
+          body={anoGravableBodyTemplate}
+          sortable
+          field="ventas.ano_gravable"
+        />
+        {/* Nuevo: Columna para Año de Venta */}
+        <Column
+          header="Año Venta"
+          body={anoVentaBodyTemplate}
+          sortable
+          field="ventas.ano_venta"
+        />
         <Column header="Cliente" body={clienteBodyTemplate} />
         <Column header="Software / Serial" body={softwareBodyTemplate} />
         <Column header="Equipo / MAC" body={equipoBodyTemplate} />
         <Column field="ip_origen" header="IP Origen" />
         <Column
           body={actionBodyTemplate}
-          exportable={false}
           style={{ width: "80px" }}
           textAlign="center"
         />

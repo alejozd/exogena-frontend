@@ -176,6 +176,17 @@ export const VentasListPage = () => {
         />
         <Column header="Estado" body={statusBodyTemplate} textAlign="center" />
         <Column
+          header="Activo"
+          body={(rd) =>
+            rd.activo ? (
+              <Tag value="ACTIVA" severity="success" />
+            ) : (
+              <Tag value="INACTIVA" severity="danger" />
+            )
+          }
+          textAlign="center"
+        />
+        <Column
           body={(rd) => (
             <div className="flex gap-2">
               <Button

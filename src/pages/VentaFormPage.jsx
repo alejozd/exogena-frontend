@@ -33,6 +33,7 @@ export const VentaFormPage = () => {
     fecha_venta: new Date(),
     valor_total: 0,
     observaciones: "",
+    activo: true,
   };
 
   const [clientes, setClientes] = useState([]);
@@ -59,7 +60,8 @@ export const VentaFormPage = () => {
       toast.current?.show({
         severity: "error",
         summary: "Error",
-        detail: "Error al recargar venta: " + (e.response?.data?.error || e.message),
+        detail:
+          "Error al recargar venta: " + (e.response?.data?.error || e.message),
       });
     }
   };
@@ -131,7 +133,8 @@ export const VentaFormPage = () => {
       toast.current?.show({
         severity: "error",
         summary: "Error",
-        detail: "Error al cargar seriales: " + (e.response?.data?.error || e.message),
+        detail:
+          "Error al cargar seriales: " + (e.response?.data?.error || e.message),
       });
     }
   };
@@ -200,7 +203,7 @@ export const VentaFormPage = () => {
               placeholder="Seleccione vendedor"
             />
           </div>
-          <div className="field col-12">
+          <div className="field col-12 md:col-8">
             <label className="font-bold">Serial</label>
             <Dropdown
               value={venta.serial_erp_id}
@@ -211,6 +214,17 @@ export const VentaFormPage = () => {
               optionValue="id"
               onChange={(e) => setVenta({ ...venta, serial_erp_id: e.value })}
               disabled={!venta.cliente_id}
+            />
+          </div>
+          <div className="field col-12 md:col-4">
+            <label className="font-bold">Estado</label>
+            <Dropdown
+              value={venta.activo}
+              options={[
+                { label: "Activa", value: true },
+                { label: "Inactiva", value: false },
+              ]}
+              onChange={(e) => setVenta({ ...venta, activo: e.value })}
             />
           </div>
           <div className="field col-12 md:col-4">

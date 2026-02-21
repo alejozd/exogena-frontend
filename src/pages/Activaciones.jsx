@@ -264,6 +264,7 @@ export const ActivacionesPage = () => {
         globalFilterFields={[
           "nombre_equipo",
           "mac_servidor",
+          "serial_recibido",
           "ventas.clientes.razon_social",
           "ventas.seriales_erp.serial_erp",
           "ip_origen",
@@ -294,6 +295,20 @@ export const ActivacionesPage = () => {
         />
         <Column header="Cliente" body={clienteBodyTemplate} />
         <Column header="Software / Serial" body={softwareBodyTemplate} />
+        <Column
+          field="serial_recibido"
+          header="Serial Recibido"
+          sortable
+          body={(rd) =>
+            rd.serial_recibido ? (
+              <code className="text-xs text-emerald-400 bg-gray-800 px-1 rounded">
+                {rd.serial_recibido}
+              </code>
+            ) : (
+              <span style={{ color: "#888" }}>—</span>
+            )
+          }
+        />
         <Column header="Equipo / MAC" body={equipoBodyTemplate} />
         <Column field="ip_origen" header="IP Origen" />
         <Column

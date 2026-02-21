@@ -10,6 +10,7 @@ import { InputIcon } from "primereact/inputicon";
 import { FilterMatchMode } from "primereact/api";
 import { Dropdown } from "primereact/dropdown";
 import { activacionesService } from "../services";
+import { useNavigate } from "react-router-dom";
 
 export const ActivacionesPage = () => {
   const ALL_YEARS_VALUE = "ALL";
@@ -23,6 +24,7 @@ export const ActivacionesPage = () => {
     { label: "Todos los años", value: ALL_YEARS_VALUE },
   ]); // Nuevo: opciones dinámicas
   const toast = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadActivaciones();
@@ -182,6 +184,10 @@ export const ActivacionesPage = () => {
     </div>
   );
 
+  const openDetalle = (rowData) => {
+    navigate(`/activaciones/${rowData.id}`);
+  };
+
   const actionBodyTemplate = (rowData) => (
     <Button
       icon="pi pi-trash"
@@ -264,7 +270,6 @@ export const ActivacionesPage = () => {
         globalFilterFields={[
           "nombre_equipo",
           "mac_servidor",
-          "serial_recibido",
           "ventas.clientes.razon_social",
           "ventas.seriales_erp.serial_erp",
           "ip_origen",
@@ -295,22 +300,22 @@ export const ActivacionesPage = () => {
         />
         <Column header="Cliente" body={clienteBodyTemplate} />
         <Column header="Software / Serial" body={softwareBodyTemplate} />
-        <Column
-          field="serial_recibido"
-          header="Serial Recibido"
-          sortable
-          body={(rd) =>
-            rd.serial_recibido ? (
-              <code className="text-xs text-emerald-400 bg-gray-800 px-1 rounded">
-                {rd.serial_recibido}
-              </code>
-            ) : (
-              <span style={{ color: "#888" }}>—</span>
-            )
-          }
-        />
         <Column header="Equipo / MAC" body={equipoBodyTemplate} />
         <Column field="ip_origen" header="IP Origen" />
+        <Column
+          header="Detalle"
+          body={(rowData) => (
+            <Button
+              icon="pi pi-eye"
+              rounded
+              outlined
+              severity="info"
+              onClick={() => openDetalle(rowData)}
+            />
+          )}
+          style={{ width: "90px" }}
+          textAlign="center"
+        />
         <Column
           body={actionBodyTemplate}
           style={{ width: "80px" }}

@@ -13,7 +13,6 @@ export const ActivacionDetallePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useRef(null);
-
   const [activacion, setActivacion] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -33,9 +32,7 @@ export const ActivacionDetallePage = () => {
       toast.current?.show({
         severity: "error",
         summary: "Error",
-        detail:
-          "No se pudo cargar el detalle: " +
-          (error.response?.data?.error || error.message),
+        detail: "No se pudo cargar el detalle",
         life: 3000,
       });
     } finally {
@@ -48,24 +45,9 @@ export const ActivacionDetallePage = () => {
     toast.current?.show({
       severity: "success",
       summary: "Copiado",
-      detail: "Texto copiado al portapapeles",
+      detail: "Texto copiado",
       life: 2000,
     });
-  };
-
-  const estadoPagoTemplate = () => {
-    const estado = activacion?.ventas?.estado_pago;
-
-    if (!estado) return null;
-
-    const severity =
-      estado === "pagado"
-        ? "success"
-        : estado === "pendiente"
-          ? "warning"
-          : "danger";
-
-    return <Tag value={estado.toUpperCase()} severity={severity} />;
   };
 
   const timelineEvents = [
@@ -73,161 +55,255 @@ export const ActivacionDetallePage = () => {
       status: "Venta registrada",
       date: activacion?.ventas?.fecha_venta,
       icon: "pi pi-shopping-cart",
+      color: "#f59e0b",
     },
     {
       status: "Activación realizada",
       date: activacion?.fecha_activacion,
-      icon: "pi pi-key",
+      icon: "pi pi-check-circle",
+      color: "#27eedeff",
     },
   ];
 
-  const Field = ({ label, value, copyable }) => (
-    <div className="mb-3">
-      <div className="text-sm text-400">{label}</div>
-      <div className="flex align-items-center justify-content-between gap-2">
-        <div
-          className="text-base font-medium text-100"
-          style={{ wordBreak: "break-word" }}
+  const Field = ({ label, value, copyable, icon }) => (
+    <div className="mb-4">
+      <div className="text-xs font-bold uppercase tracking-wider text-500 mb-1 flex align-items-center">
+        {icon && <i className={`${icon} mr-1`}></i>} {label}
+      </div>
+      <div className="flex align-items-center justify-content-between p-2 border-round bg-gray-900-alpha-20 border-1 border-gray-800">
+        <span
+          className="text-sm md:text-base font-mono text-blue-100"
+          style={{ wordBreak: "break-all" }}
         >
           {value || "N/A"}
-        </div>
+        </span>
         {copyable && value && (
           <Button
             icon="pi pi-copy"
-            className="p-button-text p-button-sm"
+            className="p-button-text p-button-sm p-0 ml-2 text-cyan-400"
             onClick={() => copiarTexto(value)}
+            tooltip="Copiar"
           />
         )}
       </div>
     </div>
   );
 
+  const StatusBadge = ({ value }) => {
+    const isPaid = value?.toLowerCase() === "pagado";
+    return (
+      <div
+        className="px-3 py-1 border-round-2xl font-bold text-xs"
+        style={{
+          backgroundColor: isPaid
+            ? "rgba(34, 197, 94, 0.2)"
+            : "rgba(245, 158, 11, 0.2)",
+          color: isPaid ? "#4ade80" : "#fbbf24",
+          border: `1px solid ${isPaid ? "#4ade80" : "#fbbf24"}`,
+        }}
+      >
+        {value?.toUpperCase() || "DESCONOCIDO"}
+      </div>
+    );
+  };
+
+  if (loading)
+    return (
+      <div className="flex justify-content-center align-items-center min-h-screen bg-gray-900">
+        <ProgressSpinner strokeWidth="3" fill="transparent" />
+      </div>
+    );
+
   return (
-    <div className="p-3 md:p-4 min-h-screen" style={{ background: "#0f172a" }}>
+    <div className="p-3 md:p-5 min-h-screen" style={{ background: "#0f172a" }}>
       <Toast ref={toast} />
 
-      {loading ? (
-        <div className="flex justify-content-center mt-6">
-          <ProgressSpinner />
-        </div>
-      ) : !activacion ? (
-        <div className="text-center text-100">
-          <h3>No se encontró la activación</h3>
-          <Button label="Volver" onClick={() => navigate(-1)} />
+      {!activacion ? (
+        <div className="text-center mt-8">
+          <i className="pi pi-exclamation-circle text-6xl text-gray-700 mb-4"></i>
+          <h3 className="text-white">No se encontró el registro</h3>
+          <Button
+            label="Regresar al Historial"
+            icon="pi pi-arrow-left"
+            onClick={() => navigate(-1)}
+          />
         </div>
       ) : (
-        <div className="max-w-6xl mx-auto">
-          {/* HEADER */}
-          <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center mb-4 gap-3 text-100">
+        <div className="max-w-7xl mx-auto">
+          {/* TOP BAR / HEADER */}
+          <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-end mb-5 gap-3">
             <div>
-              <h2 className="m-0">Activación #{activacion.id}</h2>
-              <div className="text-400 text-sm">
-                {new Date(activacion.fecha_activacion).toLocaleString()}
-              </div>
-            </div>
-
-            <div className="flex gap-2 align-items-center">
-              {estadoPagoTemplate()}
               <Button
                 label="Volver"
-                icon="pi pi-arrow-left"
-                className="p-button-outlined p-button-secondary"
+                icon="pi pi-chevron-left"
+                className="p-button-text text-gray-400 p-0 mb-2 hover:text-white"
                 onClick={() => navigate(-1)}
               />
+              <h1 className="m-0 text-white font-bold flex align-items-center">
+                ID Activación:{" "}
+                <span style={{ color: "#27eedeff" }} className="ml-2">
+                  #{activacion.id}
+                </span>
+              </h1>
+              <p className="text-gray-500 m-0">
+                Registro originado desde la IP: {activacion.ip_origen}
+              </p>
+            </div>
+            <div className="flex align-items-center gap-3">
+              <div className="text-right hidden md:block">
+                <div className="text-gray-500 text-xs uppercase font-bold">
+                  Estado de Pago
+                </div>
+                <StatusBadge value={activacion?.ventas?.estado_pago} />
+              </div>
+              <Divider layout="vertical" className="hidden md:block" />
+              <div className="bg-gray-800 p-3 border-round-xl border-1 border-gray-700">
+                <div className="text-gray-500 text-xs uppercase font-bold mb-1">
+                  Año Gravable
+                </div>
+                <div className="text-2xl font-bold text-white text-center">
+                  {activacion.ventas?.ano_gravable}
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="grid">
-            {/* INFORMACIÓN GENERAL */}
-            <div className="col-12 md:col-6">
-              <Card className="shadow-4 border-round-xl surface-card bg-gray-800 text-100">
-                <h3>
-                  <i className="pi pi-server mr-2"></i>
-                  Información General
+            {/* LADO IZQUIERDO: CLIENTE Y VENTA */}
+            <div className="col-12 lg:col-4">
+              <Card className="h-full bg-gray-800 border-none shadow-8 border-round-xl">
+                <h3 className="text-white m-0 flex align-items-center">
+                  <i className="pi pi-user text-cyan-400 mr-2 text-xl"></i>{" "}
+                  Datos del Cliente
                 </h3>
-                <Divider />
-                <Field label="IP Origen" value={activacion.ip_origen} />
-                <Field label="Nombre Equipo" value={activacion.nombre_equipo} />
-                <Field
-                  label="MAC Servidor"
-                  value={activacion.mac_servidor}
-                  copyable
-                />
-              </Card>
-            </div>
-
-            {/* CLIENTE */}
-            <div className="col-12 md:col-6">
-              <Card className="shadow-4 border-round-xl bg-gray-800 text-100">
-                <h3>
-                  <i className="pi pi-user mr-2"></i>
-                  Cliente
-                </h3>
-                <Divider />
+                <Divider className="opacity-20" />
                 <Field
                   label="Razón Social"
                   value={activacion.ventas?.clientes?.razon_social}
                 />
-                <Field label="NIT" value={activacion.ventas?.clientes?.nit} />
                 <Field
-                  label="Año Gravable"
-                  value={activacion.ventas?.ano_gravable}
+                  label="NIT / Identificación"
+                  value={activacion.ventas?.clientes?.nit}
                 />
-                <Field label="Año Venta" value={activacion.ventas?.ano_venta} />
-              </Card>
-            </div>
+                <Field
+                  label="Año de Venta"
+                  value={activacion.ventas?.ano_venta}
+                />
 
-            {/* SOFTWARE */}
-            <div className="col-12">
-              <Card className="shadow-4 border-round-xl bg-gray-800 text-100">
-                <h3>
-                  <i className="pi pi-cog mr-2"></i>
-                  Software
+                <h3 className="text-white mt-5 m-0 flex align-items-center">
+                  <i className="pi pi-clock text-cyan-400 mr-2 text-xl"></i>{" "}
+                  Línea de Tiempo
                 </h3>
-                <Divider />
-                <Field
-                  label="Nombre Software"
-                  value={activacion.ventas?.seriales_erp?.nombre_software}
-                />
-                <Field
-                  label="Serial ERP"
-                  value={activacion.ventas?.seriales_erp?.serial_erp}
-                  copyable
-                />
-                <Field
-                  label="Serial Recibido"
-                  value={activacion.serial_recibido}
-                  copyable
-                />
-              </Card>
-            </div>
-
-            {/* TIMELINE */}
-            <div className="col-12">
-              <Card className="shadow-4 border-round-xl bg-gray-800 text-100">
-                <h3>
-                  <i className="pi pi-clock mr-2"></i>
-                  Historial
-                </h3>
-                <Divider />
+                <Divider className="opacity-20" />
                 <Timeline
                   value={timelineEvents}
-                  content={(item) => (
-                    <small>
-                      {item.date ? new Date(item.date).toLocaleString() : ""}
-                    </small>
-                  )}
+                  className="customized-timeline"
                   marker={(item) => (
-                    <span className="custom-marker p-shadow-2">
-                      <i className={item.icon}></i>
+                    <span
+                      className="flex align-items-center justify-content-center border-circle p-2"
+                      style={{ backgroundColor: item.color }}
+                    >
+                      <i className={`${item.icon} text-gray-900 text-xs`}></i>
                     </span>
+                  )}
+                  content={(item) => (
+                    <div className="mb-4 ml-2">
+                      <div className="text-white font-bold text-sm">
+                        {item.status}
+                      </div>
+                      <small className="text-gray-500">
+                        {item.date
+                          ? new Date(item.date).toLocaleString()
+                          : "Pendiente"}
+                      </small>
+                    </div>
                   )}
                 />
               </Card>
+            </div>
+
+            {/* LADO DERECHO: DETALLES TÉCNICOS */}
+            <div className="col-12 lg:col-8">
+              <div className="grid">
+                {/* SOFTWARE INFO */}
+                <div className="col-12">
+                  <Card className="bg-gray-800 border-none shadow-8 border-round-xl">
+                    <h3 className="text-white m-0 flex align-items-center">
+                      <i className="pi pi-box text-cyan-400 mr-2 text-xl"></i>{" "}
+                      Especificaciones del Software
+                    </h3>
+                    <Divider className="opacity-20" />
+                    <div className="grid">
+                      <div className="col-12 md:col-6">
+                        <Field
+                          label="Nombre del Producto"
+                          value={
+                            activacion.ventas?.seriales_erp?.nombre_software
+                          }
+                        />
+                      </div>
+                      <div className="col-12 md:col-6">
+                        <Field
+                          label="Serial Autorizado (ERP)"
+                          value={activacion.ventas?.seriales_erp?.serial_erp}
+                          copyable
+                        />
+                      </div>
+                      <div className="col-12">
+                        <Field
+                          label="Serial Recibido en Petición"
+                          value={activacion.serial_recibido}
+                          copyable
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                {/* HARDWARE INFO */}
+                <div className="col-12">
+                  <Card className="bg-gray-800 border-none shadow-8 border-round-xl">
+                    <h3 className="text-white m-0 flex align-items-center">
+                      <i className="pi pi-desktop text-cyan-400 mr-2 text-xl"></i>{" "}
+                      Identificación del Equipo
+                    </h3>
+                    <Divider className="opacity-20" />
+                    <div className="grid">
+                      <div className="col-12 md:col-6">
+                        <Field
+                          label="Hostname / Nombre Equipo"
+                          icon="pi pi-tag"
+                          value={activacion.nombre_equipo}
+                        />
+                      </div>
+                      <div className="col-12 md:col-6">
+                        <Field
+                          label="Dirección MAC"
+                          icon="pi pi-share-alt"
+                          value={activacion.mac_servidor}
+                          copyable
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        :global(.p-card .p-card-body) {
+          padding: 1.5rem;
+        }
+        :global(.p-timeline-event-opposite) {
+          display: none;
+        }
+        :global(.p-timeline-event-content) {
+          padding: 0 1rem !important;
+        }
+      `}</style>
     </div>
   );
 };

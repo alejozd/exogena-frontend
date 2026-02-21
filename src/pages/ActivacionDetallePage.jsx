@@ -65,22 +65,27 @@ export const ActivacionDetallePage = () => {
   ];
 
   // Componente interno para los campos de datos
-  const Field = ({ label, value, copyable, icon }) => (
+  const Field = ({ label, value, copyable, icon, mono }) => (
     <div className="mb-4">
-      <div className="text-xs font-bold uppercase tracking-wider text-500 mb-1 flex align-items-center">
-        {icon && <i className={`${icon} mr-1`}></i>} {label}
+      <div className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1 flex align-items-center">
+        {icon && <i className={`${icon} mr-2 text-cyan-400`}></i>}
+        {label}
       </div>
-      <div className="flex align-items-center justify-content-between p-2 border-round bg-gray-900-alpha-20 border-1 border-gray-700">
+
+      <div className="flex align-items-center justify-content-between px-3 py-2 border-round-lg bg-gray-800 border-1 border-gray-700 transition-colors transition-duration-200 hover:border-cyan-500">
         <span
-          className="text-sm md:text-base font-mono text-blue-100"
+          className={`text-sm md:text-base ${
+            mono ? "font-mono text-cyan-300" : "text-gray-200"
+          }`}
           style={{ wordBreak: "break-all" }}
         >
           {value || "N/A"}
         </span>
+
         {copyable && value && (
           <Button
             icon="pi pi-copy"
-            className="p-button-text p-button-sm p-0 ml-2 text-cyan-400"
+            className="p-button-text p-button-sm p-0 ml-3 text-gray-400 hover:text-cyan-400"
             onClick={() => copiarTexto(value)}
           />
         )}
@@ -90,8 +95,12 @@ export const ActivacionDetallePage = () => {
 
   if (loading)
     return (
-      <div className="flex justify-content-center align-items-center min-h-screen bg-gray-900">
-        <ProgressSpinner strokeWidth="3" />
+      <div className="p-5 min-h-screen" style={{ background: "#0f172a" }}>
+        <div className="max-w-7xl mx-auto">
+          <Card className="bg-gray-800 border-none shadow-8 border-round-xl">
+            <ProgressSpinner strokeWidth="3" />
+          </Card>
+        </div>
       </div>
     );
 
@@ -223,9 +232,9 @@ export const ActivacionDetallePage = () => {
                       <div className="col-12 md:col-6">
                         <Field
                           label="MAC Address"
-                          icon="pi pi-share-alt"
                           value={activacion.mac_servidor}
                           copyable
+                          mono
                         />
                       </div>
                       <div className="col-12">

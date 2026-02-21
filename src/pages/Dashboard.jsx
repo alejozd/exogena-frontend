@@ -11,7 +11,7 @@ import "../styles/Dashboard.css";
 export const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedYear, setSelectedYear] = useState(2024);
+  const [selectedYear, setSelectedYear] = useState(2025);
   const [chartData, setChartData] = useState({});
   const [chartOptions, setChartOptions] = useState({});
   const navigate = useNavigate();
@@ -76,13 +76,15 @@ export const Dashboard = () => {
         // Configuramos el gráfico con los nuevos datos
         prepareChart(
           response.data.finanzas.total_facturado,
-          response.data.finanzas.total_recaudado
+          response.data.finanzas.total_recaudado,
         );
       } catch (error) {
         toast.current?.show({
           severity: "error",
           summary: "Error",
-          detail: "No se pudieron cargar las estadísticas: " + (error.response?.data?.error || error.message),
+          detail:
+            "No se pudieron cargar las estadísticas: " +
+            (error.response?.data?.error || error.message),
         });
       } finally {
         setLoading(false);
@@ -133,7 +135,7 @@ export const Dashboard = () => {
       label: "RECAUDO",
       value: formatCurrency(data?.finanzas?.total_recaudado),
       subValue: `${data?.finanzas?.porcentaje_recaudo?.toFixed(
-        1
+        1,
       )}% efectividad`,
       color: "#FB923C",
       icon: "pi-percentage",

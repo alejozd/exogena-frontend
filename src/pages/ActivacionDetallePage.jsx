@@ -4,6 +4,7 @@ import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Divider } from "primereact/divider";
 import { activacionesService } from "../services";
 
 export const ActivacionDetallePage = () => {
@@ -25,36 +26,38 @@ export const ActivacionDetallePage = () => {
 
   const loadDetalle = async () => {
     try {
-      console.log("ID recibido:", id);
-
       const response = await activacionesService.getById(id);
-
-      console.log("Respuesta backend:", response.data);
-
-      if (!response.data) {
-        setActivacion(null);
-        return;
-      }
-
-      setActivacion(response.data);
+      setActivacion(response.data || null);
     } catch (error) {
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail:
-            "No se pudo cargar el detalle: " +
-            (error.response?.data?.error || error.message),
-          life: 3000,
-        });
-      }
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail:
+          "No se pudo cargar el detalle: " +
+          (error.response?.data?.error || error.message),
+        life: 3000,
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const Field = ({ label, value, highlight }) => (
+    <div className="mb-3">
+      <div className="text-sm text-500">{label}</div>
+      <div
+        className={`text-base font-medium ${
+          highlight ? "text-emerald-400" : ""
+        }`}
+        style={{ wordBreak: "break-word" }}
+      >
+        {value || "N/A"}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="p-4">
+    <div className="p-3 md:p-4 max-w-6xl mx-auto">
       <Toast ref={toast} />
 
       {loading ? (
@@ -62,113 +65,90 @@ export const ActivacionDetallePage = () => {
           <ProgressSpinner />
         </div>
       ) : !id ? (
-        <div>
-          <h3>ID inválido.</h3>
+        <div className="text-center">
+          <h3>ID inválido</h3>
           <Button label="Volver" onClick={() => navigate(-1)} />
         </div>
       ) : !activacion ? (
-        <div>
-          <h3>No se encontró la activación.</h3>
+        <div className="text-center">
+          <h3>No se encontró la activación</h3>
           <Button label="Volver" onClick={() => navigate(-1)} />
         </div>
       ) : (
         <>
-          <div className="flex justify-content-between align-items-center mb-4">
-            <h2 className="m-0">Detalle de Activación #{activacion.id}</h2>
+          {/* HEADER */}
+          <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center mb-4 gap-3">
+            <div>
+              <h2 className="m-0 text-xl md:text-2xl">
+                Activación #{activacion.id}
+              </h2>
+              <div className="text-500 text-sm">
+                {activacion.fecha_activacion
+                  ? new Date(activacion.fecha_activacion).toLocaleString()
+                  : ""}
+              </div>
+            </div>
+
             <Button
               label="Volver"
               icon="pi pi-arrow-left"
+              className="p-button-outlined"
               onClick={() => navigate(-1)}
             />
           </div>
 
-          <Card className="shadow-2 border-round-xl bg-gray-900">
-            <div className="grid">
-              <div className="col-12 md:col-6">
-                <h4>Información General</h4>
-
-                <p>
-                  <strong>Fecha Activación:</strong>
-                  <br />
-                  {activacion.fecha_activacion
-                    ? new Date(activacion.fecha_activacion).toLocaleString()
-                    : "N/A"}
-                </p>
-
-                <p>
-                  <strong>IP Origen:</strong>
-                  <br />
-                  {activacion.ip_origen || "N/A"}
-                </p>
-
-                <p>
-                  <strong>Nombre Equipo:</strong>
-                  <br />
-                  {activacion.nombre_equipo || "N/A"}
-                </p>
-
-                <p>
-                  <strong>MAC Servidor:</strong>
-                  <br />
-                  <code>{activacion.mac_servidor || "N/A"}</code>
-                </p>
-              </div>
-
-              <div className="col-12 md:col-6">
-                <h4>Información Cliente</h4>
-
-                <p>
-                  <strong>Razón Social:</strong>
-                  <br />
-                  {activacion.ventas?.clientes?.razon_social || "N/A"}
-                </p>
-
-                <p>
-                  <strong>NIT:</strong>
-                  <br />
-                  {activacion.ventas?.clientes?.nit || "N/A"}
-                </p>
-
-                <p>
-                  <strong>Año Gravable:</strong>
-                  <br />
-                  {activacion.ventas?.ano_gravable || "N/A"}
-                </p>
-
-                <p>
-                  <strong>Año Venta:</strong>
-                  <br />
-                  {activacion.ventas?.ano_venta || "N/A"}
-                </p>
-              </div>
-
-              <div className="col-12">
-                <h4>Software</h4>
-
-                <p>
-                  <strong>Nombre Software:</strong>
-                  <br />
-                  {activacion.ventas?.seriales_erp?.nombre_software || "N/A"}
-                </p>
-
-                <p>
-                  <strong>Serial ERP:</strong>
-                  <br />
-                  <code>
-                    {activacion.ventas?.seriales_erp?.serial_erp || "N/A"}
-                  </code>
-                </p>
-
-                <p>
-                  <strong>Serial Recibido:</strong>
-                  <br />
-                  <code className="text-emerald-400">
-                    {activacion.serial_recibido || "N/A"}
-                  </code>
-                </p>
-              </div>
+          {/* CONTENIDO */}
+          <div className="grid">
+            {/* INFORMACIÓN GENERAL */}
+            <div className="col-12 md:col-6">
+              <Card className="shadow-2 border-round-xl h-full">
+                <h3 className="mt-0">Información General</h3>
+                <Divider />
+                <Field label="IP Origen" value={activacion.ip_origen} />
+                <Field label="Nombre Equipo" value={activacion.nombre_equipo} />
+                <Field label="MAC Servidor" value={activacion.mac_servidor} />
+              </Card>
             </div>
-          </Card>
+
+            {/* CLIENTE */}
+            <div className="col-12 md:col-6">
+              <Card className="shadow-2 border-round-xl h-full">
+                <h3 className="mt-0">Cliente</h3>
+                <Divider />
+                <Field
+                  label="Razón Social"
+                  value={activacion.ventas?.clientes?.razon_social}
+                />
+                <Field label="NIT" value={activacion.ventas?.clientes?.nit} />
+                <Field
+                  label="Año Gravable"
+                  value={activacion.ventas?.ano_gravable}
+                />
+                <Field label="Año Venta" value={activacion.ventas?.ano_venta} />
+              </Card>
+            </div>
+
+            {/* SOFTWARE */}
+            <div className="col-12">
+              <Card className="shadow-2 border-round-xl">
+                <h3 className="mt-0">Software</h3>
+                <Divider />
+                <Field
+                  label="Nombre Software"
+                  value={activacion.ventas?.seriales_erp?.nombre_software}
+                />
+                <Field
+                  label="Serial ERP"
+                  value={activacion.ventas?.seriales_erp?.serial_erp}
+                />
+                <Field
+                  label="Serial Recibido"
+                  value={activacion.serial_recibido}
+                  highlight
+                />
+              </Card>
+            </div>
+          </div>
         </>
       )}
     </div>

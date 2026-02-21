@@ -10,7 +10,7 @@ import { Tag } from "primereact/tag";
 import { Toast } from "primereact/toast";
 import { FilterMatchMode } from "primereact/api";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
+import { ventasService } from "../services";
 
 export const VentasListPage = () => {
   const [ventas, setVentas] = useState([]);
@@ -38,15 +38,11 @@ export const VentasListPage = () => {
     fetchVentas();
   }, [anoFiltro]);
 
-  useEffect(() => {
-    fetchVentas();
-  }, [anoFiltro]);
-
   const fetchVentas = async () => {
     setLoading(true);
     try {
       // Pasamos el año actual del estado como query param
-      const res = await api.get(`/ventas`, { params: { ano: anoFiltro } });
+      const res = await ventasService.getAll(anoFiltro);
       setVentas(res.data);
     } catch (e) {
       toast.current.show({

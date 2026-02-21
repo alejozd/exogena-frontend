@@ -10,7 +10,7 @@ import { Toast } from "primereact/toast";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { FilterMatchMode } from "primereact/api";
-import api from "../api/axios";
+import { vendedoresService } from "../services";
 
 export const VendedoresPage = () => {
   const [vendedores, setVendedores] = useState([]);
@@ -47,7 +47,7 @@ export const VendedoresPage = () => {
   const loadVendedores = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/vendedores");
+      const res = await vendedoresService.getAll();
       setVendedores(res.data);
     } catch (e) {
       toast.current.show({
@@ -74,7 +74,7 @@ export const VendedoresPage = () => {
 
     try {
       if (vendedor.id) {
-        await api.put(`/vendedores/${vendedor.id}`, vendedor);
+        await vendedoresService.update(vendedor.id, vendedor);
         toast.current.show({
           severity: "success",
           summary: "Éxito",
@@ -82,7 +82,7 @@ export const VendedoresPage = () => {
           life: 3000,
         });
       } else {
-        await api.post("/vendedores", vendedor);
+        await vendedoresService.create(vendedor);
         toast.current.show({
           severity: "success",
           summary: "Éxito",

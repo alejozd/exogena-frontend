@@ -9,7 +9,7 @@ import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { FilterMatchMode } from "primereact/api";
 import { Dropdown } from "primereact/dropdown";
-import api from "../api/axios";
+import { activacionesService } from "../services";
 
 export const ActivacionesPage = () => {
   const ALL_YEARS_VALUE = "ALL";
@@ -31,19 +31,10 @@ export const ActivacionesPage = () => {
   const loadActivaciones = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/activaciones");
+      const response = await activacionesService.getAll();
       setActivaciones(response.data);
 
-      console.log("Total activaciones cargadas:", response.data.length);
-      console.log(
-        "Registros con ano_gravable definido:",
-        response.data.filter((item) => item.ventas?.ano_gravable != null)
-          .length,
-      );
-      console.log("Años únicos encontrados:", [
-        ...new Set(response.data.map((item) => item.ventas?.ano_gravable)),
-      ]);
-      // Nuevo: Extraer años gravables únicos y ordenarlos descendente
+      // Extraer años gravables únicos y ordenarlos descendente
       const uniqueAnos = [
         ...new Set(
           response.data
@@ -104,7 +95,7 @@ export const ActivacionesPage = () => {
 
   const deleteActivacion = async (id) => {
     try {
-      await api.delete(`/activaciones/${id}`);
+      await activacionesService.delete(id);
       toast.current.show({
         severity: "success",
         summary: "Éxito",

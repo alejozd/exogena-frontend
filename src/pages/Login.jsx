@@ -5,7 +5,7 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useAuth } from "../context/useAuth";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
+import { authService } from "../services";
 import "../styles/Login.css";
 
 export const Login = () => {
@@ -36,10 +36,7 @@ export const Login = () => {
 
     setLoading(true);
     try {
-      const response = await api.post("/auth/login", {
-        email: username,
-        password: password,
-      });
+      const response = await authService.login(username, password);
 
       const user = response.data.usuario;
       const token = response.data.token;

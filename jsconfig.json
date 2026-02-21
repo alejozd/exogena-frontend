@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "checkJs": false,
+    "moduleResolution": "bundler"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

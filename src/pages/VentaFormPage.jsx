@@ -8,7 +8,12 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from "primereact/toast";
 import { Card } from "primereact/card";
 import { PagosSeccion } from "./PagosSeccion";
-import api from "../api/axios";
+import {
+  ventasService,
+  clientesService,
+  vendedoresService,
+  serialesService,
+} from "../services";
 
 export const VentaFormPage = () => {
   const { id } = useParams();
@@ -40,7 +45,7 @@ export const VentaFormPage = () => {
   const reloadVenta = async () => {
     if (!id || id === "nueva") return;
     try {
-      const resVenta = await api.get(`/ventas/${id}`);
+      const resVenta = await ventasService.getById(id);
       const v = resVenta.data;
       setVenta({
         ...v,
@@ -51,7 +56,11 @@ export const VentaFormPage = () => {
         valor_total: parseFloat(v.valor_total || 0),
       });
     } catch (e) {
-      console.error("Error al recargar venta " + e.response?.data?.error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error al recargar venta: " + (e.response?.data?.error || e.message),
+      });
     }
   };
 
@@ -65,18 +74,18 @@ export const VentaFormPage = () => {
       try {
         // Cargar catálogos básicos
         const [resClientes, resVendedores] = await Promise.all([
-          api.get("/clientes"),
-          api.get("/vendedores"),
+          clientesService.getAll(),
+          vendedoresService.getAll(),
         ]);
         setClientes(resClientes.data);
         setVendedores(resVendedores.data);
 
         if (id && id !== "nueva" && !isNaN(id)) {
-          const resVenta = await api.get(`/ventas/${id}`);
+          const resVenta = await ventasService.getById(id);
           const v = resVenta.data;
 
           // 1. Cargamos seriales del cliente antes de setear la venta
-          const resSer = await api.get(`/seriales/cliente/${v.cliente_id}`);
+          const resSer = await serialesService.getByCliente(v.cliente_id);
           setSerialesFiltrados(resSer.data);
 
           // 2. Seteamos la venta con los tipos de datos que tus catálogos esperan
@@ -116,10 +125,14 @@ export const VentaFormPage = () => {
 
   const fetchSeriales = async (clienteId) => {
     try {
-      const res = await api.get(`/seriales/cliente/${clienteId}`);
+      const res = await serialesService.getByCliente(clienteId);
       setSerialesFiltrados(res.data);
     } catch (e) {
-      console.error("Error seriales " + e.response?.data?.error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error al cargar seriales: " + (e.response?.data?.error || e.message),
+      });
     }
   };
 
@@ -135,9 +148,9 @@ export const VentaFormPage = () => {
     setLoading(true);
     try {
       if (id && !isNaN(id)) {
-        await api.put(`/ventas/${id}`, venta);
+        await ventasService.update(id, venta);
       } else {
-        await api.post("/ventas", venta);
+        await ventasService.create(venta);
       }
       toast.current.show({
         severity: "success",

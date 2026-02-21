@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import api from "../api/axios";
+import React, { useEffect, useState, useRef } from "react";
+import { dashboardService } from "../services";
 import { Skeleton } from "primereact/skeleton";
+import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Chart } from "primereact/chart";
 import { MeterGroup } from "primereact/metergroup";
@@ -14,6 +15,7 @@ export const Dashboard = () => {
   const [chartData, setChartData] = useState({});
   const [chartOptions, setChartOptions] = useState({});
   const navigate = useNavigate();
+  const toast = useRef(null);
 
   const years = [
     { label: "Año 2023", value: 2023 },
@@ -69,7 +71,7 @@ export const Dashboard = () => {
     const fetchStats = async () => {
       setLoading(true);
       try {
-        const response = await api.get(`/dashboard/stats?ano=${selectedYear}`);
+        const response = await dashboardService.getStats(selectedYear);
         setData(response.data);
         // Configuramos el gráfico con los nuevos datos
         prepareChart(
@@ -77,7 +79,11 @@ export const Dashboard = () => {
           response.data.finanzas.total_recaudado
         );
       } catch (error) {
-        console.error("Error cargando estadísticas", error);
+        toast.current?.show({
+          severity: "error",
+          summary: "Error",
+          detail: "No se pudieron cargar las estadísticas: " + (error.response?.data?.error || error.message),
+        });
       } finally {
         setLoading(false);
       }
@@ -145,6 +151,7 @@ export const Dashboard = () => {
 
   return (
     <div className="grid p-2">
+      <Toast ref={toast} />
       <div className="col-12 mb-2 flex justify-content-between align-items-center flex-wrap gap-3">
         <div style={{ color: "#f49a0a" }}>
           <h2 className="font-light m-0">

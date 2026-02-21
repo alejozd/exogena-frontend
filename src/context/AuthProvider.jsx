@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+    setUser(savedUser ? JSON.parse(savedUser) : null);
+    setLoading(false);
+  }, []);
 
   const login = (userData, token) => {
     setUser(userData);
@@ -19,10 +23,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
   };
 
-  // Al inicializar el state arriba, el valor ya es correcto desde el inicio.
-  // No necesitamos un useEffect con setLoading(false).
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

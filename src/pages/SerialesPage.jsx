@@ -13,7 +13,7 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { FilterMatchMode } from "primereact/api";
-import api from "../api/axios";
+import { serialesService, clientesService } from "../services";
 
 export const SerialesPage = () => {
   const [seriales, setSeriales] = useState([]);
@@ -51,8 +51,8 @@ export const SerialesPage = () => {
     setLoading(true);
     try {
       const [resSeriales, resClientes] = await Promise.all([
-        api.get("/seriales"),
-        api.get("/clientes"),
+        serialesService.getAll(),
+        clientesService.getAll(),
       ]);
       setSeriales(resSeriales.data);
       const clientesFormatted = resClientes.data.map((c) => ({
@@ -84,7 +84,7 @@ export const SerialesPage = () => {
     }
     try {
       if (serial.id) {
-        await api.put(`/seriales/${serial.id}`, serial);
+        await serialesService.update(serial.id, serial);
         toast.current.show({
           severity: "success",
           summary: "Éxito",
@@ -92,7 +92,7 @@ export const SerialesPage = () => {
           life: 3000,
         });
       } else {
-        await api.post("/seriales", serial);
+        await serialesService.create(serial);
         toast.current.show({
           severity: "success",
           summary: "Éxito",
@@ -124,7 +124,7 @@ export const SerialesPage = () => {
 
   const deleteSerial = async (id) => {
     try {
-      await api.delete(`/seriales/${id}`);
+      await serialesService.delete(id);
       toast.current.show({
         severity: "success",
         summary: "Éxito",

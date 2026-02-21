@@ -4,7 +4,7 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
 import { Chip } from "primereact/chip";
-import api from "../api/axios";
+import { generarClaveService } from "../services";
 import "../styles/GenerarClave.css"; // Importamos los nuevos estilos
 
 export const GenerarClavePage = () => {
@@ -26,7 +26,7 @@ export const GenerarClavePage = () => {
 
     setLoading(true);
     try {
-      const response = await api.post("/generar-clave", { serial });
+      const response = await generarClaveService.generar(serial);
       setResultado(response.data);
       setError(null);
       toast.current.show({

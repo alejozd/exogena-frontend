@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import api from "../api/axios";
+import { pagosService } from "../services";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
@@ -43,7 +43,7 @@ export const PagosPage = () => {
       // Guardamos la preferencia del usuario
       localStorage.setItem("pagos_filtro_ano", anoFiltro);
 
-      const { data } = await api.get(`/pagos`, { params: { ano: anoFiltro } });
+      const { data } = await pagosService.getAll(anoFiltro);
       setPagos(data);
     } catch (error) {
       toast.current?.show({

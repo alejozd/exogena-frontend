@@ -12,7 +12,7 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { IconField } from "primereact/iconfield"; // Para el buscador
 import { InputIcon } from "primereact/inputicon"; // Para el buscador
 import { FilterMatchMode } from "primereact/api"; // Para la lógica de filtrado
-import api from "../api/axios";
+import { clientesService, vendedoresService } from "../services";
 
 export const ClientesPage = () => {
   const [clientes, setClientes] = useState([]);
@@ -54,8 +54,8 @@ export const ClientesPage = () => {
     setLoading(true);
     try {
       const [resClientes, resVendedores] = await Promise.all([
-        api.get("/clientes"),
-        api.get("/vendedores"),
+        clientesService.getAll(),
+        vendedoresService.getAll(),
       ]);
       setClientes(resClientes.data);
       setVendedores(resVendedores.data);
@@ -84,7 +84,7 @@ export const ClientesPage = () => {
 
     try {
       if (cliente.id) {
-        await api.put(`/clientes/${cliente.id}`, cliente);
+        await clientesService.update(cliente.id, cliente);
         toast.current.show({
           severity: "success",
           summary: "Éxito",
@@ -92,7 +92,7 @@ export const ClientesPage = () => {
           life: 3000,
         });
       } else {
-        await api.post("/clientes", cliente);
+        await clientesService.create(cliente);
         toast.current.show({
           severity: "success",
           summary: "Éxito",
@@ -126,7 +126,7 @@ export const ClientesPage = () => {
 
   const deleteCliente = async (id) => {
     try {
-      await api.delete(`/clientes/${id}`);
+      await clientesService.delete(id);
       toast.current.show({
         severity: "success",
         summary: "Eliminado",

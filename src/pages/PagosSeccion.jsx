@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
 import { Dialog } from "primereact/dialog";
-import api from "../api/axios";
+import { Toast } from "primereact/toast";
+import { pagosService } from "../services";
 
 export const PagosSeccion = ({ ventaId, onPagoRegistrado }) => {
   const [pagos, setPagos] = useState([]);
+  const toast = useRef(null);
   const [showModal, setShowModal] = useState(false);
   const [nuevoPago, setNuevoPago] = useState({
     monto_pagado: 0,
@@ -24,10 +26,14 @@ export const PagosSeccion = ({ ventaId, onPagoRegistrado }) => {
     }
 
     try {
-      const res = await api.get(`/pagos/venta/${ventaId}`);
+      const res = await pagosService.getByVenta(ventaId);
       setPagos(res.data);
     } catch (error) {
-      console.error("Error al obtener pagos:", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error al obtener pagos: " + (error.response?.data?.error || error.message),
+      });
     }
   }, [ventaId]);
 
@@ -38,12 +44,16 @@ export const PagosSeccion = ({ ventaId, onPagoRegistrado }) => {
     const loadData = async () => {
       if (ventaId && ventaId !== "nueva") {
         try {
-          const res = await api.get(`/pagos/venta/${ventaId}`);
+          const res = await pagosService.getByVenta(ventaId);
           if (isMounted) {
             setPagos(res.data);
           }
         } catch (error) {
-          console.error("Error en useEffect pagos:", error);
+          toast.current?.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Error al cargar pagos: " + (error.response?.data?.error || error.message),
+          });
         }
       }
     };
@@ -57,11 +67,15 @@ export const PagosSeccion = ({ ventaId, onPagoRegistrado }) => {
 
   const registrarPago = async () => {
     if (!nuevoPago.monto_pagado || nuevoPago.monto_pagado <= 0) {
-      alert("Por favor ingrese un monto válido");
+      toast.current?.show({
+        severity: "warn",
+        summary: "Atención",
+        detail: "Por favor ingrese un monto válido",
+      });
       return;
     }
     try {
-      await api.post("/pagos", { ...nuevoPago, venta_id: ventaId });
+      await pagosService.create({ ...nuevoPago, venta_id: ventaId });
       setShowModal(false);
 
       setNuevoPago({
@@ -74,12 +88,17 @@ export const PagosSeccion = ({ ventaId, onPagoRegistrado }) => {
       await fetchPagos();
       if (onPagoRegistrado) onPagoRegistrado();
     } catch (error) {
-      console.error("Error al registrar pago", error);
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error al registrar pago: " + (error.response?.data?.error || error.message),
+      });
     }
   };
 
   return (
     <div className="mt-4">
+      <Toast ref={toast} />
       <div className="flex justify-content-between align-items-center mb-2">
         <h3 className="m-0">Historial de Pagos</h3>
         <Button

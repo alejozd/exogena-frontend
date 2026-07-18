@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
@@ -24,21 +24,29 @@ export const VentaFormPage = () => {
   // ano_gravable por defecto es el año anterior: en el año N se venden
   // medios magnéticos "del año N-1" (ver misma convención en Activaciones.jsx).
   // Ambos campos siguen siendo editables manualmente en el formulario.
-  const anoVentaDefault =
-    parseInt(localStorage.getItem("ventas_filtro_ano")) ||
-    new Date().getFullYear();
+  // Memoizado (una sola vez, sin deps reactivas) para poder incluirlo con
+  // seguridad en el array de dependencias del efecto de carga inicial.
+  const anoVentaDefault = useMemo(
+    () =>
+      parseInt(localStorage.getItem("ventas_filtro_ano")) ||
+      new Date().getFullYear(),
+    [],
+  );
 
-  const emptyVenta = {
-    cliente_id: null,
-    vendedor_id: null,
-    serial_erp_id: null,
-    ano_gravable: anoVentaDefault - 1,
-    ano_venta: anoVentaDefault,
-    fecha_venta: new Date(),
-    valor_total: 0,
-    observaciones: "",
-    activo: true,
-  };
+  const emptyVenta = useMemo(
+    () => ({
+      cliente_id: null,
+      vendedor_id: null,
+      serial_erp_id: null,
+      ano_gravable: anoVentaDefault - 1,
+      ano_venta: anoVentaDefault,
+      fecha_venta: new Date(),
+      valor_total: 0,
+      observaciones: "",
+      activo: true,
+    }),
+    [anoVentaDefault],
+  );
 
   const [clientes, setClientes] = useState([]);
   const [vendedores, setVendedores] = useState([]);
@@ -119,7 +127,7 @@ export const VentaFormPage = () => {
     };
 
     loadInitialData();
-  }, [id]);
+  }, [id, emptyVenta]);
 
   // Cargar seriales cuando cambie el cliente
   useEffect(() => {

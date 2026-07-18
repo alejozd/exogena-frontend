@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { pagosService } from "../services";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -38,7 +38,7 @@ export const PagosPage = () => {
     },
   );
 
-  const fetchPagos = async () => {
+  const fetchPagos = useCallback(async () => {
     setLoading(true);
     try {
       // Guardamos la preferencia del usuario
@@ -57,11 +57,11 @@ export const PagosPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [anoFiltro]);
 
   useEffect(() => {
     fetchPagos();
-  }, [anoFiltro]);
+  }, [fetchPagos]);
 
   // Manejador del filtro global
   const onGlobalFilterChange = (e) => {

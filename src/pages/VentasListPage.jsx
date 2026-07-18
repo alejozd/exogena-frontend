@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -36,12 +36,7 @@ export const VentasListPage = () => {
     },
   );
 
-  useEffect(() => {
-    localStorage.setItem("ventas_filtro_ano", anoFiltro);
-    fetchVentas();
-  }, [anoFiltro]);
-
-  const fetchVentas = async () => {
+  const fetchVentas = useCallback(async () => {
     setLoading(true);
     try {
       // Pasamos el año actual del estado como query param
@@ -56,7 +51,12 @@ export const VentasListPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [anoFiltro]);
+
+  useEffect(() => {
+    localStorage.setItem("ventas_filtro_ano", anoFiltro);
+    fetchVentas();
+  }, [anoFiltro, fetchVentas]);
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;

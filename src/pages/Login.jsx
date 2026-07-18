@@ -74,7 +74,7 @@ export const Login = () => {
       <Toast ref={toast} />
       <div className="login-content">
         <div className="login-logo">
-          Exógena<span> 2025</span>
+          Exógena
         </div>
 
         <div className="glass-card">

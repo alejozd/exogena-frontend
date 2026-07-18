@@ -29,13 +29,14 @@ export const PagosPage = () => {
 
   const toast = useRef(null);
 
-  // Opciones de años (Dinámico o estático según prefieras)
-  const opcionesAnos = [
-    { label: "2024", value: 2024 },
-    { label: "2025", value: 2025 },
-    { label: "2026", value: 2026 },
-    { label: "2027", value: 2027 },
-  ];
+  // Opciones de años (generadas dinámicamente, sin mantenimiento anual)
+  const opcionesAnos = Array.from(
+    { length: new Date().getFullYear() + 2 - 2024 + 1 },
+    (_, i) => {
+      const year = 2024 + i;
+      return { label: `${year}`, value: year };
+    },
+  );
 
   const fetchPagos = async () => {
     setLoading(true);

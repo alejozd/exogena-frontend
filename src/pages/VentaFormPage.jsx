@@ -20,16 +20,20 @@ export const VentaFormPage = () => {
   const navigate = useNavigate();
   const toast = useRef(null);
 
+  // ano_venta sigue el filtro persistido (o el año calendario actual).
+  // ano_gravable por defecto es el año anterior: en el año N se venden
+  // medios magnéticos "del año N-1" (ver misma convención en Activaciones.jsx).
+  // Ambos campos siguen siendo editables manualmente en el formulario.
+  const anoVentaDefault =
+    parseInt(localStorage.getItem("ventas_filtro_ano")) ||
+    new Date().getFullYear();
+
   const emptyVenta = {
     cliente_id: null,
     vendedor_id: null,
     serial_erp_id: null,
-    ano_gravable:
-      parseInt(localStorage.getItem("ventas_filtro_ano")) ||
-      new Date().getFullYear(),
-    ano_venta:
-      parseInt(localStorage.getItem("ventas_filtro_ano")) ||
-      new Date().getFullYear(),
+    ano_gravable: anoVentaDefault - 1,
+    ano_venta: anoVentaDefault,
     fecha_venta: new Date(),
     valor_total: 0,
     observaciones: "",

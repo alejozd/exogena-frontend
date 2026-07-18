@@ -27,11 +27,14 @@ export const VentasListPage = () => {
   const navigate = useNavigate();
   const toast = useRef(null);
 
-  // Generar lista de años (ej: desde 2020 hasta el actual + 1)
-  const anosOptions = Array.from({ length: 7 }, (_, i) => {
-    const year = 2022 + i;
-    return { label: `${year}`, value: year };
-  });
+  // Generar lista de años (desde 2022 hasta el actual + 2, sin mantenimiento anual)
+  const anosOptions = Array.from(
+    { length: new Date().getFullYear() + 2 - 2022 + 1 },
+    (_, i) => {
+      const year = 2022 + i;
+      return { label: `${year}`, value: year };
+    },
+  );
 
   useEffect(() => {
     localStorage.setItem("ventas_filtro_ano", anoFiltro);

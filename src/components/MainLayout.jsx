@@ -122,7 +122,7 @@ export const MainLayout = () => {
         <div className="flex flex-column h-full">
           <div className="p-4 text-center border-bottom-1 border-white-alpha-10 mb-4">
             <span className="text-2xl font-bold" style={{ color: "#0ef1da" }}>
-              Exógena<span className="text-blue-400">2025</span>
+              Exógena
             </span>
           </div>
 

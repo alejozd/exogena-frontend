@@ -11,17 +11,16 @@ import "../styles/Dashboard.css";
 export const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedYear, setSelectedYear] = useState(2025);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear() - 1);
   const [chartData, setChartData] = useState({});
   const [chartOptions, setChartOptions] = useState({});
   const navigate = useNavigate();
   const toast = useRef(null);
 
-  const years = [
-    { label: "Año 2023", value: 2023 },
-    { label: "Año 2024", value: 2024 },
-    { label: "Año 2025", value: 2025 },
-  ];
+  const years = Array.from(
+    { length: new Date().getFullYear() - 2023 + 1 },
+    (_, i) => ({ label: `Año ${2023 + i}`, value: 2023 + i }),
+  );
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("es-CO", {
